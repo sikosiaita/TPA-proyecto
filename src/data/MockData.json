@@ -1,0 +1,10 @@
+{
+  "cargas": [
+    { "id": "C1", "tipo": "Sobre", "pesoKg": 0.1, "descripcion": "Documentos legales" },
+    { "id": "C2", "tipo": "Caja", "pesoKg": 5.5, "descripcion": "Repuestos de motor" }
+  ],
+  "rutas": [
+    { "id": "R1", "origen": "Pto. Montt", "destino": "Castro", "distanciaKm": 180 },
+    { "id": "R2", "origen": "Pto. Montt", "destino": "Santiago", "distanciaKm": 1030 }
+  ]
+}
