@@ -108,3 +108,20 @@ En Preparación → En Tránsito → Entregado
 - Tailwind CSS  
 
 ## 📚 Patrones de Diseño
+- Strategy  
+- Factory method
+---
+
+**LOGO DE PINKBOX**
+<p align="center">
+  <img src=https://github.com/sikosiaita/TPA-proyecto/blob/main/WhatsApp%20Image%202026-04-25%20at%207.42.50%20PM.jpeg alt=. width="430">
+</p>
+
+---
+
+**PALETA DE COLORES**
+<p align="center">
+  <img src=https://github.com/sikosiaita/TPA-proyecto/blob/main/Captura%20de%20pantalla%202026-04-25%20221243.png alt=. width="430">
+</p>
+
+---
