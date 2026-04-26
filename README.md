@@ -1,4 +1,4 @@
-# 🚚 PinkBox
+# 📦💗 PinkBox
 
 Sistema web de **Logística y Despacho Inteligente** orientado a la simulación y gestión eficiente de envíos desde centros de distribución hacia clientes finales.  
 Desarrollado como proyecto académico para la carrera de Ingeniería Civil en Informática - Universidad de Los Lagos.
