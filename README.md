@@ -105,7 +105,7 @@ En Preparación → En Tránsito → Entregado
 - TypeScript  
 - React  
 - Leaflet.js  
-- Tailwind CSS  
+- Javascript 
 
 ## 📚 Patrones de Diseño
 - Strategy  
