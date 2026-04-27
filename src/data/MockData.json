@@ -1,0 +1,13 @@
+{
+  "item": [
+    { "id": "C1", "tipo": "Sobre", "pesoKg": 0.1, "descripcion": "Documentos legales" },
+    { "id": "C2", "tipo": "Caja", "pesoKg": 5.5, "descripcion": "Repuestos de motor" },
+    { "id": "C3", "tipo": "Caja", "pesoKg": 4.0, "descripcion": "Caja" },
+    { "id": "C4", "tipo": "Sobre", "pesoKg": 0.2, "descripcion": "Documentos RRHH" }
+  ],
+  "rutas": [
+    { "id": "R1", "origen": "Pto. Montt", "destino": "Castro", "distanciaKm": 180 },
+    { "id": "R2", "origen": "Pto. Montt", "destino": "Santiago", "distanciaKm": 1030 },
+    { "id": "R3", "origen": "Castro", "destino": "Puerto Montt", "distanciaKm": 180 }
+  ]
+}
