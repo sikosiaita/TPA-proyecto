@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logo from '../logo-tpa-3.PNG';
+import logo from '../Logo-PINBOX.png';
 
 const LoginScreen: React.FC = () => {
   const [rut, setRut] = useState('');
@@ -19,15 +19,15 @@ const LoginScreen: React.FC = () => {
         <div className="hidden md:block md:w-5/12 bg-[#FFC5C5]" />
 
         {/* LADO DERECHO (FORMULARIO) */}
-        <div className="w-full md:w-7/12 flex flex-col items-center justify-center p-8 md:p-16">
+        <div className="w-full md:w-7/12 flex flex-col items-center justify-center p-6 md:p-10">
           
           {/* LOGO Y TÍTULO */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-12 h-12 mb-2">
+          <div className="flex flex-col items-center mb-4">
+            <div className="w-20 h-20 mb-1">
               {/* Aquí va tu SVG o Imagen de PinkBox */}
               <img src={logo} alt="PinkBox Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="text-[#FF8EBD] font-semibold text-sm mb-4">PinkBox</span>
+            <span className="text-[#FF8EBD] font-semibold text-sm mb-2">PinkBox</span>
             <h1 className="text-2xl font-bold text-black mb-1">Iniciar sesión</h1>
             <p className="text-gray-600 text-sm">Mediante RUT</p>
           </div>
