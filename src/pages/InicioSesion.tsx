@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from '../Logo-PINBOX.png';
 
 const LoginScreen: React.FC = () => {
   const [rut, setRut] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Iniciando sesión con:', rut, password);
+    navigate('/dashboard');  // ← redirige al hacer submit
+    
   };
 
   return (

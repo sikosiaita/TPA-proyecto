@@ -1,10 +1,16 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import InicioSesion from './pages/InicioSesion';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
-    <div className="App">
-      <InicioSesion />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<InicioSesion />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
