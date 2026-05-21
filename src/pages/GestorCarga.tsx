@@ -1,10 +1,11 @@
 import React from 'react';
+import Layout from '../components/Layout';
 
 const GestorCarga: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <h1 className="text-2xl font-bold text-gray-700">Gestor de Carga</h1>
-    </div>
+    <Layout>
+      <h1 className="text-2xl font-bold text-gray-800">Gestor de Carga</h1>
+    </Layout>
   );
 };
 
