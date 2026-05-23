@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../Logo-PINBOX.png';
+import { Home, Truck, Drone, Bike } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -11,10 +12,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
 
   const menuItems = [
-    { label: 'INICIO', path: '/dashboard', icon: '🏠' },
-    { label: 'GESTOR DE CARGA', path: '/gestor-carga', icon: '🚛' },
-    { label: 'CENTRO DE DESPACHO', path: '/centro-despacho', icon: '✂️' },
-    { label: 'ESTADOS DE ENTREGAS', path: '/estados-entregas', icon: '🚴' },
+    { label: 'INICIO', path: '/dashboard', icon: <Home size={20} className="stroke-[2.5]" /> },
+    { label: 'GESTOR DE CARGA', path: '/gestor-carga', icon: <Truck size={20} className="stroke-[2.5]" /> },
+    { label: 'CENTRO DE DESPACHO', path: '/centro-despacho', icon: <Drone size={20} className="stroke-[2.5]" /> },
+    { label: 'ESTADOS DE ENTREGAS', path: '/estados-entregas', icon: <Bike size={20} className="stroke-[2.5]" /> },
   ];
 
   return (
@@ -43,10 +44,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex items-center gap-3 px-6 py-3 text-sm font-bold transition-colors text-left
-                  ${isActive
-                    ? 'bg-[#FF8EBD] text-white'
-                    : 'text-white hover:bg-[#FF8EBD]/60'
+                className={`flex items-center gap-3 mx-4 px-6 py-3 text-sm font-bold transition-colors text-left rounded-full
+                  ${isActive 
+                    ? 'bg-[#FF8EBD] text-white shadow-sm' 
+                    : 'text-white hover:bg-[#FF8EBD]/40'
                   }`}
               >
                 <span>{item.icon}</span>

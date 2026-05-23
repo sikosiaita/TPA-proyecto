@@ -9,7 +9,7 @@ const InicioSesion: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');  // ← redirige al hacer submit
+    navigate('/dashboard');
     
   };
 
