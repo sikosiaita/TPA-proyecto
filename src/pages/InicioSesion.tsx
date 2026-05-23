@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../Logo-PINBOX.png';
+import logo from '../logo-tpa-1.PNG';
 
-const LoginScreen: React.FC = () => {
+const InicioSesion: React.FC = () => {
   const [rut, setRut] = useState('');
-  const [password, setPassword] = useState('');
+  const [contraseña, setContraseña] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -19,18 +19,18 @@ const LoginScreen: React.FC = () => {
       <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-[30px] overflow-hidden shadow-2xl min-h-[500px]">
         
         {/* LADO IZQUIERDO (ROSADO) */}
-        <div className="hidden md:block md:w-5/12 bg-[#FFC5C5]" />
+        <div className="hidden md:flex md:w-5/12 bg-[#FFC5C5] items-center justify-center">
+            <div className="w-60 h-60 mb-1">
+              <img src={logo} alt="PinkBox Logo" className="w-full h-full object-contain" />
+            </div>
+        </div>
+        
 
         {/* LADO DERECHO (FORMULARIO) */}
         <div className="w-full md:w-7/12 flex flex-col items-center justify-center p-6 md:p-10">
           
           {/* LOGO Y TÍTULO */}
           <div className="flex flex-col items-center mb-4">
-            <div className="w-20 h-20 mb-1">
-              {/* Aquí va tu SVG o Imagen de PinkBox */}
-              <img src={logo} alt="PinkBox Logo" className="w-full h-full object-contain" />
-            </div>
-            <span className="text-[#FF8EBD] font-semibold text-sm mb-2">PinkBox</span>
             <h1 className="text-2xl font-bold text-black mb-1">Iniciar sesión</h1>
             <p className="text-gray-600 text-sm">Mediante RUT</p>
           </div>
@@ -51,8 +51,8 @@ const LoginScreen: React.FC = () => {
               <input
                 type="password"
                 placeholder="Ingrese contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={contraseña}
+                onChange={(e) => setContraseña(e.target.value)}
                 className="w-full px-6 py-3 border-2 border-black rounded-full focus:outline-none focus:ring-2 focus:ring-[#FF8EBD] transition-all text-center"
               />
             </div>
@@ -61,7 +61,7 @@ const LoginScreen: React.FC = () => {
               type="submit"
               className="w-full bg-[#FFA0A0] hover:bg-[#FF8EBD] text-white font-bold py-3 rounded-full transition-colors mt-6 shadow-md"
             >
-              Continuar
+              Iniciar Sesión
             </button>
           </form>
         </div>
@@ -70,4 +70,4 @@ const LoginScreen: React.FC = () => {
   );
 };
 
-export default LoginScreen;
+export default InicioSesion;
