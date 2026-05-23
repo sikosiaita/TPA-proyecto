@@ -13,8 +13,8 @@ const InicioSesion: React.FC = () => {
     
   };
 
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#FF8EBD] p-4">
+  return (                                                               //DEGRADADO DE ARRIBA HACIA ABAJO
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-[#f69fae] to-[#ff82bd] p-4">
       {/* CONTENEDOR PRINCIPAL */}
       <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-[30px] overflow-hidden shadow-2xl min-h-[500px]">
         
