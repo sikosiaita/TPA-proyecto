@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import logo from '../Logo-PINBOX.png';
+import logo from '../logo-tpa-1.PNG';
+import userAvatar from '../logo-user.png';
 import { Home, Truck, Drone, Bike } from 'lucide-react';
 
 interface LayoutProps {
@@ -27,11 +28,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <img src={logo} alt="PinkBox Logo" className="w-10 h-10 object-contain" />
           <span className="text-white font-bold text-sm">PinkBox</span>
         </div>
-        <div className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center bg-white cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9 9 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </div>
+        <img
+          src={userAvatar}
+          alt="Usuario"
+          className="w-10 h-10 rounded-full object-cover cursor-pointer"
+        />
       </nav>
 
       <div className="flex flex-1">
