@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </aside>
 
         {/* CONTENIDO DE LA PÁGINA */}
-        <main className="flex-1 p-8 overflow-auto">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
 
