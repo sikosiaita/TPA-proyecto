@@ -15,6 +15,9 @@ const GestorCarga: React.FC = () => {
   // Estado en el que se inicializa con la capacidad máxima (en este caso 50 kg)
   const [capacidadRestante, setCapacidadRestante] = useState<number>(50);
 
+  // Arreglo que guardará los objetos de los ítems a medida que se vayan agregando
+  const [listaItems, setListaItems] = useState<any[]>([]);
+
   // Función para abrir/cerrar la lista
   const toggleItem = (id: string) => {
     setItemExpandido(itemExpandido === id ? null : id);
@@ -36,10 +39,20 @@ const GestorCarga: React.FC = () => {
       itemJson.pesoKg
     );
 
+    // Agrega el ítem actual al estado para que aparezca en la tabla
+    setListaItems([...listaItems, {
+      id: itemJson.id,
+      tipo: itemJson.tipo,
+      volumen: "x m/3", 
+      precioBase: 0, 
+      costoAdicional: 0,
+      total: 0
+    }]);
+
     // Usa el método "agregarComponente()" en clase "Contenedor" para agregar al arreglo
     contenedorPrincipal.current.agregarComponente(nuevoItem);
 
-    // Calcula la nueva capacidad restante
+    // Calcula la nueva capacidad
     const pesoRestante = capacidadRestante - itemJson.pesoKg;
 
     // Actualiza la capacidad restante
@@ -198,11 +211,44 @@ const GestorCarga: React.FC = () => {
           {/* LADO DERECHO */}
           <div className="lg:col-span-7 p-6 flex flex-col">
 
-            {/* Bloque Rosado de la Tabla */}
+            {/* TABLA CON EL CONTENIDO */}
             <div className="bg-[#FFAEC1] p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
-              <div className="border-2 border-dashed border-pink-300 bg-white/70 h-full rounded flex items-center justify-center text-pink-400 font-bold text-center p-4">
-                3. Tabla de Contenidos (Fondo rosado)
+              
+              {/* ENCABEZADO DE LA TABLA: Títulos de las columnas */}
+              <div className="grid grid-cols-6 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-700 text-xs mb-3 shadow-sm uppercase tracking-wider">
+                <div>Código</div>
+                <div>Tipo</div>
+                <div>Volumen</div>
+                <div>Precio B.</div>
+                <div>Costo A.</div>
+                <div>Total</div>
               </div>
+
+              {/* CUERPO DE LA TABLA: Contenedor con scroll para las filas */}
+              <div className="flex-grow space-y-2 overflow-y-auto max-h-[280px] pr-1">
+                {listaItems.length === 0 ? (
+                  // Mensaje que se muestra si todavía no se agregan ítems
+                  <div className="bg-white/70 h-full min-h-[200px] border-2 border-dashed border-pink-300 rounded-lg flex items-center justify-center text-gray-500 text-sm italic p-4 text-center">
+                    El contenedor está vacío. <br /> Agrega ítems desde el panel izquierdo.
+                  </div>
+                ) : (
+                  // Mapeo dinámico cuando la lista ya tiene elementos
+                  listaItems.map((item, index) => (
+                    <div 
+                      key={item.id + "-" + index} 
+                      className="grid grid-cols-6 gap-2 bg-white p-3 rounded-lg text-center text-gray-600 text-xs items-center shadow-sm hover:bg-gray-50 transition-colors animate-fade-in"
+                    >
+                      <div className="font-mono font-bold text-gray-800">{item.id}</div>
+                      <div className="capitalize">{item.tipo}</div>
+                      <div className="text-gray-400 font-medium">{item.volumen}</div>
+                      <div>${item.precioBase}</div>
+                      <div>${item.costoAdicional}</div>
+                      <div className="font-bold text-pink-600">${item.total}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+
             </div>
 
             {/* Zona Inferior: Capacidad y Botón Guardar */}
