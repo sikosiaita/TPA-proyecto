@@ -64,7 +64,7 @@ const GestorCarga: React.FC = () => {
   return (
     <Layout>
       {/* CONTENEDOR PRINCIPAL */}
-      <div className="bg-white w-full h-full min-h-screen flex flex-col text-gray-800">
+      <div className="w-full h-full min-h-screen flex flex-col text-gray-800">
 
         {/* CONTENEDOR SUPERIOR: TÍTULO */}
         <div className="p-6 border-b border-gray-200">
@@ -233,7 +233,7 @@ const GestorCarga: React.FC = () => {
                     El contenedor está vacío. <br /> Agrega ítems desde el panel izquierdo.
                   </div>
                 ) : (
-                  // UN SOLO BLOQUE BLANCO para contener todas las filas unificadas
+                  // Un solo bloque blanco para contener todas las filas unificadas
                   <div className="bg-white/90 flex-grow min-h-[220px] rounded-lg p-2 shadow-sm divide-y divide-gray-100">
                     {listaItems.map((item, index) => (
                       <div 

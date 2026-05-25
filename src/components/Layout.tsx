@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen flex flex-col bg-gray-100">
 
       {/* NAVBAR SUPERIOR */}
-      <nav className="w-full bg-[#FFC5C5] flex items-center justify-between px-6 py-3 shadow-md">
+      <nav className="w-full bg-[#FF9EAF] flex items-center justify-between px-6 py-3 shadow-md">
         <div className="flex items-center gap-2">
           <img src={logo} alt="PinkBox Logo" className="w-10 h-10 object-contain" />
           <span className="text-white font-bold text-sm">PinkBox</span>
@@ -38,7 +38,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex flex-1">
 
         {/* BARRA LATERAL */}
-        <aside className="w-64 bg-[#FFB3C6] flex flex-col py-6 gap-2 shadow-lg">
+        <aside className="w-64 bg-[#FFC0C3] flex flex-col py-6 gap-2 shadow-lg">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -47,8 +47,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => navigate(item.path)}
                 className={`flex items-center gap-3 mx-4 px-6 py-3 text-sm font-bold transition-colors text-left rounded-full
                   ${isActive 
-                    ? 'bg-[#FF8EBD] text-white shadow-sm' 
-                    : 'text-white hover:bg-[#FF8EBD]/40'
+                    ? 'bg-[#FF8FA9] text-white shadow-sm' 
+                    : 'text-white hover:bg-[#f79eb3]'
                   }`}
               >
                 <span>{item.icon}</span>
