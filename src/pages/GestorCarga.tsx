@@ -1,15 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
+//IMPORTAR LAS CLASES
+import { Contenedor } from '../domain/carga/Contenedor';
+import { Item } from '../domain/carga/Item';
 
 const GestorCarga: React.FC = () => {
 
   // Estado para guardar el 'id' del ítem que está expandido
   const [itemExpandido, setItemExpandido] = useState<string | null>(null);
+  
+  const contenedorPrincipal = useRef(new Contenedor("CONT-001", "Pallet"));
+
+  // Estado en el que se inicializa con la capacidad máxima (en este caso 50 kg)
+  const [capacidadRestante, setCapacidadRestante] = useState<number>(50);
 
   // Función para abrir/cerrar la lista
   const toggleItem = (id: string) => {
     setItemExpandido(itemExpandido === id ? null : id);
+  };
+
+  // Función que une JSON con Dominio
+  const handleAgregarAlContenedor = (itemJson: any) => {
+
+    // VALIDACIÓN (Verifica que no se exceda del peso máximo)
+    if (itemJson.pesoKg > capacidadRestante) {
+      alert(`¡El ítem es muy pesado! Solo queda ${capacidadRestante.toFixed(2)}kg de capacidad.`);
+      return; // Corta la ejecución
+    }
+    
+    // Crea el Item con el constructor 
+    const nuevoItem = new Item(
+      itemJson.id, 
+      itemJson.descripcion, 
+      itemJson.pesoKg
+    );
+
+    // Usa el método "agregarComponente()" en clase "Contenedor" para agregar al arreglo
+    contenedorPrincipal.current.agregarComponente(nuevoItem);
+
+    // Calcula la nueva capacidad restante
+    const pesoRestante = capacidadRestante - itemJson.pesoKg;
+
+    // Actualiza la capacidad restante
+    setCapacidadRestante(pesoRestante);
+    
+    console.log(`Ítem agregado. Capacidad restante: ${pesoRestante}kg`);
   };
 
   return (
@@ -95,7 +131,7 @@ const GestorCarga: React.FC = () => {
                     {mockData.item.map((item) => (
                       <div key={item.id} className="flex flex-col">
                         
-                        {/* Botón principal con la descripción del ítem */}
+                        {/* BOTÓN PRINCIPAL CON LA DESCRIPCIÓN DEL ÍTEM */}
                         <button 
                           onClick={() => toggleItem(item.id)}
                           className="text-left font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 p-3 rounded-md transition border border-gray-200 flex justify-between items-center"
@@ -138,7 +174,10 @@ const GestorCarga: React.FC = () => {
 
                             {/* BOTÓN "AGREGAR" */}
                             <div className="flex justify-center mt-2">
-                              <button className="border border-black text-black font-bold text-xs py-1.5 px-6 rounded-md uppercase tracking-wide hover:bg-gray-100 transition">
+                              <button 
+                                onClick={() => handleAgregarAlContenedor(item)}
+                                className="border border-black text-black font-bold text-xs py-1.5 px-6 rounded-md uppercase tracking-wide hover:bg-gray-100 transition"
+                                >
                                 Agregar
                               </button>
                             </div>
@@ -156,32 +195,36 @@ const GestorCarga: React.FC = () => {
 
           </div>
 
-          {/* --- PANEL DERECHO (Ocupa 7/12) --- */}
+          {/* LADO DERECHO */}
           <div className="lg:col-span-7 p-6 flex flex-col">
 
             {/* Bloque Rosado de la Tabla */}
-            <div className="bg-pink-100 p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
+            <div className="bg-[#FFAEC1] p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
               <div className="border-2 border-dashed border-pink-300 bg-white/70 h-full rounded flex items-center justify-center text-pink-400 font-bold text-center p-4">
                 3. Tabla de Contenidos (Fondo rosado)
               </div>
             </div>
 
             {/* Zona Inferior: Capacidad y Botón Guardar */}
-            <div className="h-32 flex flex-col justify-between">
-              
-              {/* Capacidad Restante */}
-              <div className="w-48 border-2 border-dashed border-gray-300 h-16 rounded flex items-center justify-center text-gray-400 text-xs font-bold">
-                4. Capacidad Restante
-              </div>
-              
-              {/* Botón Guardar (Centrado abajo) */}
-              <div className="flex justify-center mt-4">
-                <div className="w-40 border-2 border-dashed border-gray-300 h-10 rounded flex items-center justify-center text-gray-400 text-xs font-bold uppercase cursor-pointer hover:bg-gray-50 transition">
-                  Botón Guardar
-                </div>
-              </div>
-
+            <div className="h-32 flex flex-col justify-between items-start">
+            
+            {/* Visualización del peso */}
+            <h3 className="font-bold text-gray-800 text-sm mb-2">Capacidad restante</h3>
+            <div className="w-48 border border-gray-200 bg-[#FFAEC1] shadow-sm h-16 rounded flex flex-col items-center justify-center text-gray-800">
+              <span className="text-xl font-black text-white">
+                  {capacidadRestante.toFixed(2)} kg
+                </span>
             </div>
+            
+            {/* Botón Guardar */}
+            <div className="w-full flex justify-end mt-4">
+              <button className="bg-[#FFAEC1] text-white py-2 px-12 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#FF86B5] transition-colors">
+                Guardar
+              </button>
+            </div>
+
+          </div>
+        
 
           </div>
 
