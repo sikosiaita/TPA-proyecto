@@ -209,7 +209,7 @@ const GestorCarga: React.FC = () => {
           </div>
 
           {/* LADO DERECHO */}
-          <div className="lg:col-span-7 p-6 flex flex-col">
+          <div className="lg:col-span-7 p-6 flex flex-col self-start">
 
             {/* TABLA CON EL CONTENIDO */}
             <div className="bg-[#FFAEC1] p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
@@ -232,20 +232,22 @@ const GestorCarga: React.FC = () => {
                     El contenedor está vacío. <br /> Agrega ítems desde el panel izquierdo.
                   </div>
                 ) : (
-                  // Mapeo dinámico cuando la lista ya tiene elementos
-                  listaItems.map((item, index) => (
-                    <div 
-                      key={item.id + "-" + index} 
-                      className="grid grid-cols-6 gap-2 bg-white p-3 rounded-lg text-center text-gray-600 text-xs items-center shadow-sm hover:bg-gray-50 transition-colors animate-fade-in"
-                    >
-                      <div className="font-mono font-bold text-gray-800">{item.id}</div>
-                      <div className="capitalize">{item.tipo}</div>
-                      <div className="text-gray-400 font-medium">{item.volumen}</div>
-                      <div>${item.precioBase}</div>
-                      <div>${item.costoAdicional}</div>
-                      <div className="font-bold text-pink-600">${item.total}</div>
-                    </div>
-                  ))
+                  // UN SOLO BLOQUE BLANCO para contener todas las filas unificadas
+                  <div className="bg-white/90 flex-grow min-h-[220px] rounded-lg p-2 shadow-sm divide-y divide-gray-100">
+                    {listaItems.map((item, index) => (
+                      <div 
+                        key={item.id + "-" + index} 
+                        className="grid grid-cols-6 gap-2 py-3 text-center text-gray-600 text-xs items-center hover:bg-gray-50/50 transition-colors"
+                      >
+                        <div className="font-bold text-gray-800">{item.id}</div>
+                        <div className="font-bold text-gray-800">{item.tipo}</div>
+                        <div className="font-bold text-gray-800">{item.volumen}</div>
+                        <div className="font-bold text-gray-800">${item.precioBase}</div>
+                        <div className="font-bold text-gray-800">${item.costoAdicional}</div>
+                        <div className="font-bold text-gray-800">${item.total}</div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -256,15 +258,15 @@ const GestorCarga: React.FC = () => {
             
             {/* Visualización del peso */}
             <h3 className="font-bold text-gray-800 text-sm mb-2">Capacidad restante</h3>
-            <div className="w-48 border border-gray-200 bg-[#FFAEC1] shadow-sm h-16 rounded flex flex-col items-center justify-center text-gray-800">
+            <div className="w-40 border border-gray-200 bg-[#FFAEC1] shadow-sm h-12 rounded-lg flex flex-col items-center justify-center text-gray-800">
               <span className="text-xl font-black text-white">
                   {capacidadRestante.toFixed(2)} kg
                 </span>
             </div>
             
             {/* Botón Guardar */}
-            <div className="w-full flex justify-end mt-4">
-              <button className="bg-[#FFAEC1] text-white py-2 px-12 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#FF86B5] transition-colors">
+            <div className="w-full flex justify-center mt-4">
+              <button className="bg-[#FFAEC1] text-white py-1 px-8 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#FF86B5] transition-colors">
                 Guardar
               </button>
             </div>
