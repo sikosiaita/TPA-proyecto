@@ -1,5 +1,5 @@
 export interface ComponenteCarga {
     id: string;
-    obtenerPeso(): number;
+    obtenerVolumen(): number;
     obtenerDescripcion(): string;
 }

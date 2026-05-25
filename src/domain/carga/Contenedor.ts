@@ -25,13 +25,13 @@ export class Contenedor implements ComponenteCarga {
     }
   }
 
-  public obtenerPeso(): number { //SE SUMA TODOS LOS ITEMS DENTRO DEL CONTENEDOR 
-    return this.componentes.reduce((pesoTotal, componenteActual) => {
-      return pesoTotal + componenteActual.obtenerPeso();
+  public obtenerVolumen(): number { //SE SUMA TODOS LOS ITEMS DENTRO DEL CONTENEDOR 
+    return this.componentes.reduce((volumenTotal, componenteActual) => {
+      return volumenTotal + componenteActual.obtenerVolumen();
     }, 0);
   }
 
   public obtenerDescripcion(): string {
-    return `Contenedor [${this.tipo}] con ${this.componentes.length} elementos. Peso total: ${this.obtenerPeso()} kg`;
+    return `Contenedor [${this.tipo}] con ${this.componentes.length} elementos. Peso total: ${this.obtenerVolumen()} kg`;
   }
 }

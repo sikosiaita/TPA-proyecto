@@ -12,8 +12,8 @@ const GestorCarga: React.FC = () => {
   
   const contenedorPrincipal = useRef(new Contenedor("CONT-001", "Pallet"));
 
-  // Estado en el que se inicializa con la capacidad máxima (en este caso 50 kg)
-  const [capacidadRestante, setCapacidadRestante] = useState<number>(50);
+  // Estado en el que se inicializa con la capacidad máxima (en este caso 1 m^3)
+  const [capacidadRestante, setCapacidadRestante] = useState<number>(1);
 
   // Arreglo que guardará los objetos de los ítems a medida que se vayan agregando
   const [listaItems, setListaItems] = useState<any[]>([]);
@@ -26,9 +26,9 @@ const GestorCarga: React.FC = () => {
   // Función que une JSON con Dominio
   const handleAgregarAlContenedor = (itemJson: any) => {
 
-    // VALIDACIÓN (Verifica que no se exceda del peso máximo)
-    if (itemJson.pesoKg > capacidadRestante) {
-      alert(`¡El ítem es muy pesado! Solo queda ${capacidadRestante.toFixed(2)}kg de capacidad.`);
+    // VALIDACIÓN (Verifica que no se exceda del volumen máximo)
+    if (itemJson.volumen > capacidadRestante) {
+      alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m^3 de capacidad.`);
       return; // Corta la ejecución
     }
     
@@ -36,14 +36,14 @@ const GestorCarga: React.FC = () => {
     const nuevoItem = new Item(
       itemJson.id, 
       itemJson.descripcion, 
-      itemJson.pesoKg
+      itemJson.volumen
     );
 
     // Agrega el ítem actual al estado para que aparezca en la tabla
     setListaItems([...listaItems, {
       id: itemJson.id,
       tipo: itemJson.tipo,
-      volumen: "x m/3", 
+      volumen: itemJson.volumen, 
       precioBase: 0, 
       costoAdicional: 0,
       total: 0
@@ -53,12 +53,12 @@ const GestorCarga: React.FC = () => {
     contenedorPrincipal.current.agregarComponente(nuevoItem);
 
     // Calcula la nueva capacidad
-    const pesoRestante = capacidadRestante - itemJson.pesoKg;
+    const volumenRestante = capacidadRestante - itemJson.volumen;
 
     // Actualiza la capacidad restante
-    setCapacidadRestante(pesoRestante);
+    setCapacidadRestante(volumenRestante);
     
-    console.log(`Ítem agregado. Capacidad restante: ${pesoRestante}kg`);
+    console.log(`Ítem agregado. Capacidad restante: ${volumenRestante}m^3`);
   };
 
   return (
@@ -87,7 +87,7 @@ const GestorCarga: React.FC = () => {
                   Centro de distribución - Salida
                 </label>
                 <select 
-                  className="w-full bg-white border border-gray-200 text-gray-800 py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
+                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="pto-montt"
                 >
                   <option value="" disabled>Seleccione un centro...</option>
@@ -103,7 +103,7 @@ const GestorCarga: React.FC = () => {
                   Centro de distribución - Destino
                 </label>
                 <select 
-                  className="w-full bg-white border border-gray-200 text-gray-800 py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
+                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="castro"
                 >
                   <option value="" disabled>Seleccione un centro...</option>
@@ -119,7 +119,7 @@ const GestorCarga: React.FC = () => {
                   Tipo de contenedor
                 </label>
                 <select 
-                  className="w-full bg-white border border-gray-200 text-gray-800 py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
+                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="pallet"
                 >
                   <option value="" disabled>Seleccione un centro...</option>
@@ -137,8 +137,8 @@ const GestorCarga: React.FC = () => {
               <div className="flex-grow overflow-y-auto pr-1">
                 
                 {/* CAJA CONTENEDORA */}
-                <div className="border border-gray-200 bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex flex-col gap-2">
+                <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm ">
+                  <div className="flex flex-col gap-2 max-h-[265px] overflow-y-auto pr-2">
                     
                     {/* RECORRE EL ARCHIVO MOCKDATA */}
                     {mockData.item.map((item) => (
@@ -147,7 +147,7 @@ const GestorCarga: React.FC = () => {
                         {/* BOTÓN PRINCIPAL CON LA DESCRIPCIÓN DEL ÍTEM */}
                         <button 
                           onClick={() => toggleItem(item.id)}
-                          className="text-left font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 p-3 rounded-md transition border border-gray-200 flex justify-between items-center"
+                          className="text-left font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 py-1.3 px-2 rounded-md transition border border-gray-200 flex justify-between items-center"
                         >
                           {item.descripcion}
                           <span className="text-xl text-gray-500 font-normal">
@@ -160,9 +160,10 @@ const GestorCarga: React.FC = () => {
                           <div className="border-t-2 border-b-2 border-black py-4 mt-2 px-2 animate-fade-in">
                             
                             {/* TIPO Y PESO DEL JSON */}
-                            <div className="flex gap-4 mb-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                            <div className="flex gap-4 mb-4 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
                               <p>Tipo: <span className="text-gray-800">{item.tipo}</span></p>
                               <p>Peso: <span className="text-gray-800">{item.pesoKg} kg</span></p>
+                              <p>Volumen: <span className="text-gray-800">{item.volumen} m^3</span></p>
                             </div>
 
                             {/* SECCIÓN DE OPCIONES: COSTOS ADICIONALES */}
@@ -260,7 +261,7 @@ const GestorCarga: React.FC = () => {
             <h3 className="font-bold text-gray-800 text-sm mb-2">Capacidad restante</h3>
             <div className="w-40 border border-gray-200 bg-[#FFAEC1] shadow-sm h-12 rounded-lg flex flex-col items-center justify-center text-gray-800">
               <span className="text-xl font-black text-white">
-                  {capacidadRestante.toFixed(2)} kg
+                  {capacidadRestante.toFixed(2)} m^3
                 </span>
             </div>
             

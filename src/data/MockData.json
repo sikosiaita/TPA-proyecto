@@ -1,9 +1,13 @@
 {
   "item": [
-    { "id": "C1", "tipo": "Sobre", "pesoKg": 0.1, "descripcion": "Documentos legales" },
-    { "id": "C2", "tipo": "Caja", "pesoKg": 5.5, "descripcion": "Repuestos de motor" },
-    { "id": "C3", "tipo": "Caja", "pesoKg": 4.0, "descripcion": "Caja" },
-    { "id": "C4", "tipo": "Sobre", "pesoKg": 0.2, "descripcion": "Documentos RRHH" }
+    { "id": "C1", "tipo": "Sobre", "pesoKg": 0.1, "volumen": 0.02, "descripcion": "Documentos legales" },
+    { "id": "C2", "tipo": "Caja", "pesoKg": 5.5, "volumen": 0.3, "descripcion": "Repuestos de motor" },
+    { "id": "C3", "tipo": "Caja", "pesoKg": 4.0, "volumen": 0.4, "descripcion": "Caja" },
+    { "id": "C4", "tipo": "Sobre", "pesoKg": 0.2,"volumen": 0.01, "descripcion": "Documentos RRHH" },
+    { "id": "C5", "tipo": "Caja", "pesoKg": 7.2,"volumen": 0.5, "descripcion": "Caja" },
+    { "id": "C6", "tipo": "Sobre", "pesoKg": 0.2,"volumen": 0.01, "descripcion": "Documentos RRHH" },
+    { "id": "C6", "tipo": "Sobre", "pesoKg": 0.2,"volumen": 0.01, "descripcion": "Documentos RRHH" },
+    { "id": "C6", "tipo": "Sobre", "pesoKg": 0.2,"volumen": 0.01, "descripcion": "Documentos RRHH" }
   ],
   "rutas": [
     { "id": "R1", "origen": "Pto. Montt", "destino": "Castro", "distanciaKm": 180 },

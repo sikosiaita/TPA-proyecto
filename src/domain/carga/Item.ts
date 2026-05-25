@@ -3,19 +3,19 @@ import { ComponenteCarga } from './ComponenteCarga';
 export class Item implements ComponenteCarga {
   public id: string;
   public nombre: string;
-  private pesoKg: number;
+  private volumen: number;
 
-  constructor(id: string, nombre: string, pesoKg: number) {
+  constructor(id: string, nombre: string, volumen: number) {
     this.id = id;
     this.nombre = nombre;
-    this.pesoKg = pesoKg;
+    this.volumen = volumen;
   }
 
-  public obtenerPeso(): number {
-    return this.pesoKg;
+  public obtenerVolumen(): number {
+    return this.volumen;
   }
 
   public obtenerDescripcion(): string {
-    return `Item: ${this.nombre} (${this.pesoKg} kg)`;
+    return `Item: ${this.nombre} (${this.volumen} kg)`;
   }
 }
