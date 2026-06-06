@@ -7,73 +7,132 @@ import { Item } from '../domain/carga/Item';
 
 const GestorCarga: React.FC = () => {
 
-  // Estado para guardar el 'id' del ítem que está expandido
   const [itemExpandido, setItemExpandido] = useState<string | null>(null);
-  
   const contenedorPrincipal = useRef(new Contenedor("CONT-001", "Pallet"));
-
-  // Estado en el que se inicializa con la capacidad máxima (en este caso 1 m^3)
   const [capacidadRestante, setCapacidadRestante] = useState<number>(1);
-
-  // Arreglo que guardará los objetos de los ítems a medida que se vayan agregando
   const [listaItems, setListaItems] = useState<any[]>([]);
 
-  // Función para abrir/cerrar la lista
+  // Estado para el modal de confirmación
+  const [modalEstado, setModalEstado] = useState<'oculto' | 'visible' | 'saliendo'>('oculto');
+  const modalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const toggleItem = (id: string) => {
     setItemExpandido(itemExpandido === id ? null : id);
   };
 
-  // Función que une JSON con Dominio
   const handleAgregarAlContenedor = (itemJson: any) => {
-
-    // VALIDACIÓN (Verifica que no se exceda del volumen máximo)
     if (itemJson.volumen > capacidadRestante) {
       alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m^3 de capacidad.`);
       return;
     }
-    
-    // Crea el Item con el constructor 
+
     const nuevoItem = new Item(
-      itemJson.id, 
-      itemJson.descripcion, 
+      itemJson.id,
+      itemJson.descripcion,
       itemJson.volumen
     );
 
-    // Agrega el ítem actual al estado para que aparezca en la tabla
     setListaItems([...listaItems, {
       id: itemJson.id,
       tipo: itemJson.tipo,
-      volumen: itemJson.volumen, 
-      precioBase: 0, 
+      volumen: itemJson.volumen,
+      precioBase: 0,
       costoAdicional: 0,
       total: 0
     }]);
 
-    // Usa el método "agregarComponente()" en clase "Contenedor" para agregar al arreglo
     contenedorPrincipal.current.agregarComponente(nuevoItem);
-
-    // Calcula la nueva capacidad
     const volumenRestante = capacidadRestante - itemJson.volumen;
-
-    // Actualiza la capacidad restante
     setCapacidadRestante(volumenRestante);
-    
     console.log(`Ítem agregado. Capacidad restante: ${volumenRestante}m^3`);
   };
 
-  // Función para eliminar un ítem de la tabla y liberar su volumen
   const handleEliminarItem = (index: number, volumen: number) => {
     const nuevaLista = listaItems.filter((_, i) => i !== index);
     setListaItems(nuevaLista);
     setCapacidadRestante(prev => Math.min(1, prev + volumen));
   };
 
+  const handleGuardar = () => {
+    if (modalTimer.current) clearTimeout(modalTimer.current);
+    setModalEstado('visible');
+    modalTimer.current = setTimeout(() => {
+      setModalEstado('saliendo');
+      setTimeout(() => setModalEstado('oculto'), 280);
+    }, 2800);
+  };
+
   return (
     <Layout>
-      {/* CONTENEDOR PRINCIPAL */}
+
+      {/* MODAL DE CONFIRMACIÓN — fixed para centrar en el viewport */}
+      {modalEstado !== 'oculto' && (
+        <div
+          className="flex items-center justify-center"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            className="flex flex-col items-center gap-4 rounded-2xl px-12 py-10"
+            style={{
+              backgroundColor: '#D4537E',
+              width: 240,
+              pointerEvents: 'auto',
+              animation: modalEstado === 'visible'
+                ? 'modalIn 0.3s cubic-bezier(0.34,1.3,0.64,1) forwards'
+                : 'modalOut 0.28s ease forwards',
+            }}
+          >
+            {/* Círculo con check */}
+            <div
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: 68,
+                height: 68,
+                backgroundColor: 'rgba(255,255,255,0.25)',
+                animation: 'circleGrow 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards',
+              }}
+            >
+              <svg width="30" height="30" viewBox="0 0 30 30" style={{ overflow: 'visible' }}>
+                <polyline
+                  points="5,15 12,22 25,8"
+                  stroke="white"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    strokeDasharray: 60,
+                    strokeDashoffset: 0,
+                    animation: 'checkDraw 0.4s 0.25s ease forwards',
+                  }}
+                />
+              </svg>
+            </div>
+
+            {/* Texto */}
+            <div
+              className="flex flex-col items-center gap-0.5"
+              style={{ animation: 'textUp 0.3s 0.3s ease both' }}
+            >
+              <p className="font-bold uppercase tracking-widest text-white text-sm m-0">
+                Carga
+              </p>
+              <p className="font-bold uppercase tracking-widest text-white text-sm m-0">
+                Guardada
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="w-full h-full min-h-screen flex flex-col text-gray-800">
 
-        {/* CONTENEDOR SUPERIOR: TÍTULO */}
+        {/* TÍTULO */}
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-xl font-bold uppercase tracking-wide">
             Crear Carga
@@ -85,15 +144,13 @@ const GestorCarga: React.FC = () => {
 
           {/* LADO IZQUIERDO */}
           <div className="lg:col-span-5 border-r border-gray-200 flex flex-col h-full">
-            
-            {/* Mitad superior izquierda: Selectores */}
+
             <div className="p-6 pb-2">
-              {/* SELECTOR 1: CENTRO DE DISTRIBUCIÓN SALIDA */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">
                   Centro de distribución - Salida
                 </label>
-                <select 
+                <select
                   className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="pto-montt"
                 >
@@ -104,12 +161,11 @@ const GestorCarga: React.FC = () => {
                 </select>
               </div>
 
-              {/* SELECTOR 2: CENTRO DE DISTRIBUCIÓN DESTINO */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">
                   Centro de distribución - Destino
                 </label>
-                <select 
+                <select
                   className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="castro"
                 >
@@ -120,12 +176,11 @@ const GestorCarga: React.FC = () => {
                 </select>
               </div>
 
-              {/* SELECTOR 3: TIPO DE CONTENEDOR */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">
                   Tipo de contenedor
                 </label>
-                <select 
+                <select
                   className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
                   defaultValue="pallet"
                 >
@@ -136,18 +191,14 @@ const GestorCarga: React.FC = () => {
               </div>
             </div>
 
-            {/* Mitad inferior izquierda: Ítems */}
             <div className="px-6 pb-6 flex-grow flex flex-col overflow-hidden">
               <h3 className="font-bold text-gray-800 text-sm mb-2">Items</h3>
-              
               <div className="flex-grow overflow-y-auto pr-1">
                 <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm">
                   <div className="flex flex-col gap-2 max-h-[265px] overflow-y-auto pr-2">
-                    
                     {mockData.item.map((item) => (
                       <div key={item.id} className="flex flex-col">
-                        
-                        <button 
+                        <button
                           onClick={() => toggleItem(item.id)}
                           className="text-left font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 py-1.3 px-2 rounded-md transition border border-gray-200 flex justify-between items-center"
                         >
@@ -159,7 +210,6 @@ const GestorCarga: React.FC = () => {
 
                         {itemExpandido === item.id && (
                           <div className="border-t-2 border-b-2 border-black py-4 mt-2 px-2 animate-fade-in">
-                            
                             <div className="flex gap-4 mb-4 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
                               <p>Tipo: <span className="text-gray-800">{item.tipo}</span></p>
                               <p>Peso: <span className="text-gray-800">{item.pesoKg} kg</span></p>
@@ -185,20 +235,17 @@ const GestorCarga: React.FC = () => {
                             </div>
 
                             <div className="flex justify-center mt-2">
-                              <button 
+                              <button
                                 onClick={() => handleAgregarAlContenedor(item)}
                                 className="border border-black text-black font-bold text-xs py-1.5 px-6 rounded-md uppercase tracking-wide hover:bg-gray-100 transition"
                               >
                                 Agregar
                               </button>
                             </div>
-                            
                           </div>
                         )}
-                        
                       </div>
                     ))}
-
                   </div>
                 </div>
               </div>
@@ -209,10 +256,8 @@ const GestorCarga: React.FC = () => {
           {/* LADO DERECHO */}
           <div className="lg:col-span-7 p-6 flex flex-col self-start">
 
-            {/* TABLA CON EL CONTENIDO */}
+            {/* TABLA */}
             <div className="bg-[#FFAEC1] p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
-              
-              {/* ENCABEZADO: 7 columnas (la última para el botón ×) */}
               <div className="grid grid-cols-7 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-700 text-xs mb-3 shadow-sm uppercase tracking-wider">
                 <div>Código</div>
                 <div>Tipo</div>
@@ -223,7 +268,6 @@ const GestorCarga: React.FC = () => {
                 <div></div>
               </div>
 
-              {/* CUERPO DE LA TABLA */}
               <div className="flex-grow space-y-2 overflow-y-auto max-h-[280px] pr-1">
                 {listaItems.length === 0 ? (
                   <div className="bg-white/70 h-full min-h-[200px] border-2 border-dashed border-pink-300 rounded-lg flex items-center justify-center text-gray-500 text-sm italic p-4 text-center">
@@ -232,8 +276,8 @@ const GestorCarga: React.FC = () => {
                 ) : (
                   <div className="bg-white/90 flex-grow min-h-[220px] rounded-lg p-2 shadow-sm divide-y divide-gray-100">
                     {listaItems.map((item, index) => (
-                      <div 
-                        key={item.id + "-" + index} 
+                      <div
+                        key={item.id + "-" + index}
                         className="grid grid-cols-7 gap-2 py-3 text-center text-gray-600 text-xs items-center hover:bg-gray-50/50 transition-colors"
                       >
                         <div className="font-bold text-gray-800">{item.id}</div>
@@ -256,10 +300,9 @@ const GestorCarga: React.FC = () => {
                   </div>
                 )}
               </div>
-
             </div>
 
-            {/* Zona Inferior: Capacidad y Botón Guardar */}
+            {/* ZONA INFERIOR */}
             <div className="flex flex-col gap-4 mt-2">
 
               {/* Capacidad restante */}
@@ -270,8 +313,6 @@ const GestorCarga: React.FC = () => {
                 <span className="text-2xl font-bold text-gray-800">
                   {capacidadRestante.toFixed(2)} m³
                 </span>
-
-                {/* Barra de progreso */}
                 <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500 ease-in-out"
@@ -286,14 +327,16 @@ const GestorCarga: React.FC = () => {
                     }}
                   />
                 </div>
-
                 <span className="text-xs text-gray-400">
                   {((capacidadRestante / 1) * 100).toFixed(0)}% disponible
                 </span>
               </div>
 
               {/* Botón Guardar */}
-              <button className="bg-[#D4537E] text-white py-2 px-8 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#993556] transition-colors text-sm w-fit">
+              <button
+                onClick={handleGuardar}
+                className="bg-[#D4537E] text-white py-2 px-8 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#993556] transition-colors text-sm w-fit"
+              >
                 Guardar
               </button>
 
@@ -304,6 +347,31 @@ const GestorCarga: React.FC = () => {
         </div>
 
       </div>
+
+      {/* KEYFRAMES */}
+      <style>{`
+        @keyframes modalIn {
+          from { opacity: 0; transform: scale(0.88); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes modalOut {
+          from { opacity: 1; transform: scale(1); }
+          to   { opacity: 0; transform: scale(0.88); }
+        }
+        @keyframes circleGrow {
+          from { transform: scale(0.5); opacity: 0; }
+          to   { transform: scale(1);   opacity: 1; }
+        }
+        @keyframes checkDraw {
+          from { stroke-dashoffset: 60; }
+          to   { stroke-dashoffset: 0;  }
+        }
+        @keyframes textUp {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
     </Layout>
   );
 };
