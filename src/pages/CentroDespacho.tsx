@@ -3,6 +3,8 @@ import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
 import {VEHICULOS} from '../data/MockDataVehiculos';
 
+import { Transporte } from '../domain/transporte/Transporte';
+import { crearEstrategia } from '../domain/transporte/FactoryTransporte';
 
 
 type VehiculoKey = keyof typeof VEHICULOS;
@@ -39,9 +41,11 @@ const CentroDespacho: React.FC = () => {
     return tiposEnCarga.every(t => v.tiposPermitidos.includes(t as any));
   };
 
+
   const calcularCostoVehiculo = (key: VehiculoKey) => {
-    const v = VEHICULOS[key];
-    return v.costoBase + v.costoPorKm * ruta.distanciaKm;
+    const estrategia = crearEstrategia(key); 
+    const miTransporte = new Transporte(key, key, estrategia);
+    return miTransporte.obtenerCostoEnvio(ruta.distanciaKm);
   };
 
   const handleAgregar = (item: any) => {
@@ -335,7 +339,7 @@ const CentroDespacho: React.FC = () => {
         </div>
 
       </div>
-      
+
       {/*ANIMACIONES*/}
       <style>{`
         @keyframes modalIn { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
