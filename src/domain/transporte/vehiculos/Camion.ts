@@ -1,4 +1,5 @@
 import { EstrategiaTransporte } from '../EstrategiaTransporte'; // (../) <- ESTO ES PARA CUANDO EL ARCHIVO ESTÁ FUERA DEL ACTUAL
+import {VEHICULOS} from '../../../data/MockDataVehiculos';
 
 export class Camion implements EstrategiaTransporte {
   calcularCosto(distanciaKm: number, pesoKg: number): number {
