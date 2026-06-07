@@ -12,8 +12,8 @@ export class Transporte {
   }
 
 
-  public obtenerCostoEnvio(distanciaKm: number, pesoKg: number): number {
-    return this.estrategia.calcularCosto(distanciaKm, pesoKg);
+  public obtenerCostoEnvio(distanciaKm: number): number {
+    return this.estrategia.calcularCosto(distanciaKm);
   }
 
   public obtenerTiempoEnvio(distanciaKm: number): string {
