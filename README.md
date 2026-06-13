@@ -108,7 +108,8 @@ En Preparación → En Tránsito → Entregado
 - Javascript 
 
 ## 📚 Patrones de Diseño
-- Strategy  
+- Strategy
+- Composite
 - Factory method
 ---
 
