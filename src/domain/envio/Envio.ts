@@ -17,10 +17,10 @@ export class Envio {
 
   getColorEstado(): string {
     switch (this.estado) {
-      case EstadoEnvio.EN_PREPARACION: return '#FFAEC1';
-      case EstadoEnvio.EN_TRANSITO:    return '#ED93B1';
-      case EstadoEnvio.ENTREGADO:      return '#4ade80';
-      case EstadoEnvio.FALLIDO:        return '#f87171';
+      case EstadoEnvio.EN_PREPARACION: return '#3b82f6'; //azul
+      case EstadoEnvio.EN_TRANSITO:    return '#f97316'; //naranja
+      case EstadoEnvio.ENTREGADO:      return '#22c55e'; //verde
+      case EstadoEnvio.FALLIDO:        return '#ef4444'; //rojo
     }
   }
 }

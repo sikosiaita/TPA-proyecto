@@ -3,30 +3,18 @@ import Layout from '../components/Layout';
 import { Envio } from '../domain/envio/Envio'; 
 import { EstadoEnvio } from '../domain/envio/EstadoEnvio'; 
 
-// Datos mockeados para visualizar la interfaz.
+// Datos mockeados creados como instancias reales de la clase Envio
 const MOCK_ENVIOS: Envio[] = [
-  new Envio('ENV-001', 'Centro Pto. Montt', 'Castro', 'Camión', EstadoEnvio.EN_PREPARACION, '2 Días'),
-  new Envio('ENV-002', 'Centro Osorno', 'Pto. Varas', 'Dron', EstadoEnvio.EN_TRANSITO, '3 Horas'),
-  new Envio('ENV-003', 'Centro Castro', 'Chonchi', 'Moto', EstadoEnvio.ENTREGADO, null),
-  new Envio('ENV-004', 'Centro Pto. Montt', 'Ancud', 'Camión', EstadoEnvio.FALLIDO, null),
-  new Envio('ENV-005', 'Centro Castro', 'Quellón', 'Camión', EstadoEnvio.EN_TRANSITO, '5 Horas'),
+  new Envio('ENV-1042', 'Pto. Montt', 'Castro', 'Camión', EstadoEnvio.EN_TRANSITO, '3 hrs'),
+  new Envio('ENV-2089', 'Castro', 'Dalcahue', 'Motocicleta', EstadoEnvio.EN_PREPARACION, '-'),
+  new Envio('ENV-3114', 'Pto. Montt', 'Quellón', 'Camión', EstadoEnvio.ENTREGADO, '-'),
+  new Envio('ENV-4052', 'Quellón', 'Castro', 'Drone', EstadoEnvio.FALLIDO, '-'),
 ];
-
-// Helper para los colores de los puntos de estado según el mockup
-const obtenerColorPunto = (estado: EstadoEnvio | string) => {
-  switch (estado) {
-    case EstadoEnvio.EN_TRANSITO: return '#3b82f6'; // Azul
-    case EstadoEnvio.EN_PREPARACION: return '#f97316'; // Naranja
-    case EstadoEnvio.ENTREGADO: return '#22c55e'; // Verde
-    case EstadoEnvio.FALLIDO: return '#ef4444'; // Rojo
-    default: return '#9ca3af'; // Gris
-  }
-};
 
 const EstadoEntrega: React.FC = () => {
   const [busquedaId, setBusquedaId] = useState<string>('');
   
-  // Filtrado de envíos básico (solo para la demostración del buscador)
+  // Filtrado por ID utilizando el estado local
   const enviosFiltrados = useMemo(() => {
     return MOCK_ENVIOS.filter((envio) => {
       return envio.id.toLowerCase().includes(busquedaId.toLowerCase());
@@ -42,7 +30,7 @@ const EstadoEntrega: React.FC = () => {
           <h1 className="text-xl font-bold uppercase tracking-wide">Estados de Entregas</h1>
         </div>
 
-        {/* CONTROLES: Buscador y Filtros */}
+        {/* CONTROLES */}
         <div className="flex justify-center items-center gap-8 py-8 bg-[#F3F4F6]">
           
           {/* Input Búsqueda */}
@@ -86,7 +74,7 @@ const EstadoEntrega: React.FC = () => {
           <div className="bg-[#FFAEC1] p-6 rounded-xl flex-grow shadow-sm flex flex-col">
             
             {/* Cabecera de la Tabla */}
-            <div className="grid grid-cols-7 gap-2 bg-[#ffc1d1] p-3 rounded-t-xl text-center text-gray-800 text-sm border-b border-pink-200">
+            <div className="grid grid-cols-7 gap-2 bg-[#ffc1d1] p-3 rounded-t-xl text-center text-gray-800 text-sm border-b border-pink-200 font-bold uppercase tracking-wider">
               <div>ID de Envío</div>
               <div>Origen</div>
               <div>Destino</div>
@@ -97,35 +85,35 @@ const EstadoEntrega: React.FC = () => {
             </div>
 
             {/* Cuerpo de la Tabla */}
-            <div className="bg-white rounded-b-xl shadow-sm flex-grow">
+            <div className="bg-white rounded-b-xl shadow-sm flex-grow flex flex-col">
               {enviosFiltrados.length === 0 ? (
-                <div className="p-8 text-center text-gray-500 italic">
+                <div className="p-8 text-center text-gray-500 italic flex-grow flex items-center justify-center">
                   No se encontraron resultados.
                 </div>
               ) : (
-                <div className="flex flex-col">
-                  {enviosFiltrados.map((envio, index) => (
+                <div className="flex flex-col flex-grow">
+                  {enviosFiltrados.map((envio) => (
                     <div
-                      key={index}
+                      key={envio.id}
                       className="grid grid-cols-7 gap-2 py-4 text-center text-gray-700 text-sm items-center border-b border-gray-100 hover:bg-gray-50 transition-colors last:border-b-0"
                     >
-                      <div>{envio.id}</div>
+                      <div className="font-semibold">{envio.id}</div>
                       <div>{envio.origen}</div>
                       <div>{envio.destino}</div>
                       <div>{envio.transporte}</div>
                       
-                      {/* Estado con punto de color */}
+                      {/* Estado vinculando directamente el método de tu clase */}
                       <div className="flex items-center justify-center gap-2">
                         <span 
                           className="w-2.5 h-2.5 rounded-full" 
-                          style={{ backgroundColor: obtenerColorPunto(envio.estado) }}
+                          style={{ backgroundColor: envio.getColorEstado() }}
                         ></span>
-                        <span>{envio.estado}</span>
+                        <span className="capitalize">{envio.estado}</span>
                       </div>
                       
                       <div>{envio.tiempoEstimado || '-'}</div>
                       
-                      {/* Acción (Lupa) */}
+                      {/* Acción */}
                       <div className="flex justify-center">
                         <button className="text-gray-500 hover:text-[#D4537E] transition-colors">
                           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -137,8 +125,8 @@ const EstadoEntrega: React.FC = () => {
                     </div>
                   ))}
                   
-                  {/* Espacio en blanco simulando el resto de la tabla vacía como en el mockup */}
-                  <div className="h-40 bg-white rounded-b-xl"></div>
+                  {/* Espacio elástico inferior que mantiene la estética del mockup */}
+                  <div className="flex-grow bg-white rounded-b-xl min-h-[120px]"></div>
                 </div>
               )}
             </div>
