@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../logo-tpa-1.PNG';
+import logo from '../assets/images/logo-tpa-1.png';
 
 const InicioSesion: React.FC = () => {
   const [rut, setRut] = useState('');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import logo from '../logo-tpa-1.PNG';
-import userAvatar from '../logo-user.png';
+import logo from '../assets/images/logo-tpa-1.png';
+import userAvatar from '../assets/images/logo-user.png';
 import { Home, Truck, Drone, Bike } from 'lucide-react';
 
 interface LayoutProps {
