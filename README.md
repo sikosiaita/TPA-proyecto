@@ -112,6 +112,7 @@ En Preparación → En Tránsito → Entregado
 - Composite
 - Factory method
 - Observer
+- Singleton
 ---
 
 **LOGO DE PINKBOX**
