@@ -18,3 +18,20 @@ const ENVIOS_ACTIVOS = mockData.rutas.map((r: any, idx: number) => ({
 
 const enTransito = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'En tránsito').length;
 const completados = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'Completado').length;
+
+// ── Coordenadas en el SVG del mapa (posiciones relativas) ─────────
+const NODOS: Record<string, { x: number; y: number; label: string }> = {
+  'Pto. Montt':   { x: 200, y: 80,  label: 'Pto. Montt' },
+  'Puerto Montt': { x: 200, y: 80,  label: 'Pto. Montt' },
+  'Osorno':       { x: 220, y: 40,  label: 'Osorno' },
+  'Castro':       { x: 160, y: 180, label: 'Castro' },
+  'Santiago':     { x: 260, y: 320, label: 'Santiago' },
+};
+
+// ── Componente marcador animado sobre SVG ─────────────────────────
+interface MarcadorSVGProps {
+  x1: number; y1: number;
+  x2: number; y2: number;
+  color: string;
+}
+
