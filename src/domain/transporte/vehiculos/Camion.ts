@@ -1,9 +1,15 @@
 import { EstrategiaTransporte } from '../EstrategiaTransporte'; // (../) <- ESTO ES PARA CUANDO EL ARCHIVO ESTÁ FUERA DEL ACTUAL
+import {VEHICULOS} from '../../../data/MockDataVehiculos';
+import mockData from '../../../data/MockData.json';
 
 export class Camion implements EstrategiaTransporte {
-  calcularCosto(distanciaKm: number, pesoKg: number): number {
-    return 5000 + (distanciaKm * 150) + (pesoKg * 50); 
-    //FÓRMULA COSTO TOTAL CAMIÓN= COSTO FIJO: $5.000 + $15O*DISTANCIA + $50*PESO
+  calcularCosto(distanciaKm: number): number {
+
+    const costoBase = VEHICULOS.camion.costoBase;
+    const costoPorKm = VEHICULOS.camion.costoPorKm;
+
+    return costoBase + (distanciaKm * costoPorKm); 
+    //FÓRMULA COSTO TOTAL CAMIÓN
   }
   calcularTiempoEstimado(distanciaKm: number): string {
     return `${Math.ceil(distanciaKm / 70)} hrs`; // LAS COMILLAS INVERTIDAS (``) PERMITEN MEZCLAR TEXTO CON VARIABLES

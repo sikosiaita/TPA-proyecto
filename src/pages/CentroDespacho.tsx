@@ -1,38 +1,11 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
-import { Truck, Bike, Wind } from 'lucide-react';
+import {VEHICULOS} from '../data/MockDataVehiculos';
 
-//  Tarifas de vehículos 
-const VEHICULOS = {
-  dron: {
-    nombre: 'Dron',
-    descripcion: 'Sobres y documentos livianos',
-    costoBase: 2000,
-    costoPorKm: 150,
-    capacidadMax: 0.05,
-    tiposPermitidos: ['Sobre'],
-    Icon: Wind,
-  },
-  moto: {
-    nombre: 'Moto',
-    descripcion: 'Cajas medianas y sobres',
-    costoBase: 3500,
-    costoPorKm: 250,
-    capacidadMax: 0.5,
-    tiposPermitidos: ['Sobre', 'Caja'],
-    Icon: Bike,
-  },
-  camion: {
-    nombre: 'Camión',
-    descripcion: 'Pallets y cargas grandes',
-    costoBase: 15000,
-    costoPorKm: 800,
-    capacidadMax: 10,
-    tiposPermitidos: ['Sobre', 'Caja', 'Pallet'],
-    Icon: Truck,
-  },
-} as const;
+import { Transporte } from '../domain/transporte/Transporte';
+import { crearEstrategia } from '../domain/transporte/FactoryTransporte';
+
 
 type VehiculoKey = keyof typeof VEHICULOS;
 
@@ -68,9 +41,11 @@ const CentroDespacho: React.FC = () => {
     return tiposEnCarga.every(t => v.tiposPermitidos.includes(t as any));
   };
 
+
   const calcularCostoVehiculo = (key: VehiculoKey) => {
-    const v = VEHICULOS[key];
-    return v.costoBase + v.costoPorKm * ruta.distanciaKm;
+    const estrategia = crearEstrategia(key); 
+    const miTransporte = new Transporte(key, key, estrategia);
+    return miTransporte.obtenerCostoEnvio(ruta.distanciaKm);
   };
 
   const handleAgregar = (item: any) => {
@@ -365,6 +340,7 @@ const CentroDespacho: React.FC = () => {
 
       </div>
 
+      {/*ANIMACIONES*/}
       <style>{`
         @keyframes modalIn { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1); } }
         @keyframes modalOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.88); } }

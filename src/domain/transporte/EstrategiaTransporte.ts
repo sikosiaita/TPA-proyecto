@@ -1,4 +1,4 @@
 export interface EstrategiaTransporte {
-  calcularCosto(distanciaKm: number, pesoKg: number): number;
+  calcularCosto(distanciaKm: number): number;
   calcularTiempoEstimado(distanciaKm: number): string;
 }
