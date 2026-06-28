@@ -1,13 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
+import mockData from '../data/MockData.json';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { Package, Truck, CheckCircle, Clock } from 'lucide-react';
 
-const Dashboard: React.FC = () => {
-  return (
-    <Layout>
-      <h1 className="text-2xl font-bold text-gray-700">Bienvenido</h1>
-      <p className="text-gray-500 mt-2">Selecciona una opción del menú</p>
-    </Layout>
-  );
-};
 
-export default Dashboard;
+
