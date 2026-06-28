@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
 import {VEHICULOS} from '../data/MockDataVehiculos';
-
 import { Transporte } from '../domain/transporte/Transporte';
 import { crearEstrategia } from '../domain/transporte/FactoryTransporte';
+import { envioService } from '../domain/envio/EnvioService'; 
 
 
 type VehiculoKey = keyof typeof VEHICULOS;
@@ -59,6 +59,16 @@ const CentroDespacho: React.FC = () => {
 
   const handleDespachar = () => {
     if (!vehiculoSeleccionado) return;
+
+    
+    const rutaReal = mockData.rutas.find(r => r.id === rutaSeleccionada);
+    //El operador ?? asegura que si es "undefined" se arrojará una string por defecto
+    const origenFormulario = rutaReal?.origen ?? 'Origen Desconocido' // Ejemplo por si usas estado
+    const destinoFormulario = rutaReal?.destino ?? 'Origen Desconocido'
+    const transporteFormulario = vehiculoSeleccionado; 
+
+    envioService.crearEnvio(origenFormulario, destinoFormulario, transporteFormulario);
+
     if (modalTimer.current) clearTimeout(modalTimer.current);
     setModalEstado('visible');
     modalTimer.current = setTimeout(() => {

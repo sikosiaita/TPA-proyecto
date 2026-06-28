@@ -5,7 +5,7 @@ import { envioService } from '../domain/envio/EnvioService';
 
 const EstadoEntrega: React.FC = () => {
   const [busquedaId, setBusquedaId] = useState<string>('');
-  const [listaEnvios, setListaEnvios] = useState<Envio[]>([]);
+  const [listaEnvios, setListaEnvios] = useState(() => envioService.getEnvios());
 
   //Gestión de la Suscripción (Observer)
   useEffect(() => {
@@ -22,7 +22,7 @@ const EstadoEntrega: React.FC = () => {
   }, []);
   
   const enviosFiltrados = useMemo(() => {
-    return listaEnvios.filter((envio) => {
+    return listaEnvios.filter((envio: Envio) => {
       return envio.id.toLowerCase().includes(busquedaId.toLowerCase());
     });
   }, [busquedaId, listaEnvios]); // Agregamos listaEnvios a las dependencias

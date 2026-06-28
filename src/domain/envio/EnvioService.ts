@@ -31,6 +31,10 @@ class EnvioService {
     this.observadores.forEach(callback => callback([...this.envios]));
   }
 
+  getEnvios(): Envio[] {
+  return this.envios;
+  }
+  
   // Este método se llama en la pantalla "CentroDespacho.tsx" para guardar un despacho nuevo
   crearEnvio(origen: string, destino: string, transporte: string) {
     const nuevoId = `ENV-${Math.floor(1000 + Math.random() * 9000)}`; // Genera un ID aleatorio tipo ENV-XXXX
