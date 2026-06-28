@@ -1,25 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { Envio } from '../domain/envio/Envio'; 
-import { EstadoEnvio } from '../domain/envio/EstadoEnvio'; 
-
-// Datos mockeados creados como instancias reales de la clase Envio
-const MOCK_ENVIOS: Envio[] = [
-  new Envio('ENV-1042', 'Pto. Montt', 'Castro', 'Camión', EstadoEnvio.EN_TRANSITO, '3 hrs'),
-  new Envio('ENV-2089', 'Castro', 'Dalcahue', 'Motocicleta', EstadoEnvio.EN_PREPARACION, '-'),
-  new Envio('ENV-3114', 'Pto. Montt', 'Quellón', 'Camión', EstadoEnvio.ENTREGADO, '-'),
-  new Envio('ENV-4052', 'Quellón', 'Castro', 'Drone', EstadoEnvio.FALLIDO, '-'),
-];
+import { envioService } from '../domain/envio/EnvioService'; 
 
 const EstadoEntrega: React.FC = () => {
   const [busquedaId, setBusquedaId] = useState<string>('');
+  const [listaEnvios, setListaEnvios] = useState<Envio[]>([]);
+
+  //Gestión de la Suscripción (Observer)
+  useEffect(() => {
+
+    const actualizarObservador = (enviosActualizados: Envio[]) => {
+      setListaEnvios(enviosActualizados);
+    };
+
+    envioService.suscribir(actualizarObservador);
+
+    return () => {
+      envioService.desuscribir(actualizarObservador);
+    };
+  }, []);
   
-  // Filtrado por ID utilizando el estado local
   const enviosFiltrados = useMemo(() => {
-    return MOCK_ENVIOS.filter((envio) => {
+    return listaEnvios.filter((envio) => {
       return envio.id.toLowerCase().includes(busquedaId.toLowerCase());
     });
-  }, [busquedaId]);
+  }, [busquedaId, listaEnvios]); // Agregamos listaEnvios a las dependencias
 
   return (
     <Layout>
