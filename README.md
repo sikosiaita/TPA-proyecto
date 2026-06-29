@@ -111,6 +111,8 @@ En Preparación → En Tránsito → Entregado
 - Strategy
 - Composite
 - Factory method
+- Observer
+- Singleton
 ---
 
 **LOGO DE PINKBOX**
