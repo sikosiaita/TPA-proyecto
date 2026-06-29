@@ -35,3 +35,39 @@ interface MarcadorSVGProps {
   color: string;
 }
 
+const MarcadorSVG: React.FC<MarcadorSVGProps> = ({ x1, y1, x2, y2, color }) => {
+  const [t, setT] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const inicioRef = useRef<number | null>(null);
+  const duracion = 4000;
+
+  useEffect(() => {
+    const animar = (timestamp: number) => {
+      if (!inicioRef.current) inicioRef.current = timestamp;
+      const elapsed = timestamp - inicioRef.current;
+      const progress = Math.min(elapsed / duracion, 1);
+      setT(progress);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animar);
+      } else {
+        setTimeout(() => {
+          inicioRef.current = null;
+          setT(0);
+          rafRef.current = requestAnimationFrame(animar);
+        }, 1000);
+      }
+    };
+    rafRef.current = requestAnimationFrame(animar);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [x1, y1, x2, y2]);
+
+  const cx = x1 + (x2 - x1) * t;
+  const cy = y1 + (y2 - y1) * t;
+
+  return (
+    <circle cx={cx} cy={cy} r={6} fill={color} stroke="white" strokeWidth={2}>
+      <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite" />
+    </circle>
+  );
+};
+
