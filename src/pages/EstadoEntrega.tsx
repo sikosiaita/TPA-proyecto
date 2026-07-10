@@ -101,7 +101,7 @@ const EstadoEntrega: React.FC = () => {
                   {enviosFiltrados.map((envio) => (
                     <div
                       key={envio.id}
-                      className="grid grid-cols-7 gap-2 py-4 text-center text-gray-700 text-sm items-center border-b border-gray-100 hover:bg-gray-50 transition-colors last:border-b-0"
+                      className="grid grid-cols-7 gap-2 py-4 px-4 text-left text-gray-700 text-sm items-center border-b border-gray-100 hover:bg-gray-50 transition-colors last:border-b-0"
                     >
                       <div className="font-semibold">{envio.id}</div>
                       <div>{envio.origen}</div>
@@ -109,7 +109,7 @@ const EstadoEntrega: React.FC = () => {
                       <div>{envio.transporte}</div>
                       
                       {/* Estado vinculando directamente el método de tu clase */}
-                      <div className="flex items-center justify-center gap-2">
+                      <div className="flex items-center justify-start gap-2">
                         <span 
                           className="w-2.5 h-2.5 rounded-full" 
                           style={{ backgroundColor: envio.getColorEstado() }}
@@ -117,7 +117,7 @@ const EstadoEntrega: React.FC = () => {
                         <span className="capitalize">{envio.estado}</span>
                       </div>
                       
-                      <div>{envio.tiempoEstimado || '-'}</div>
+                      <div className="text-center">{envio.tiempoEstimado || '-'}</div>
                       
                       {/* Acción */}
                       <div className="flex justify-center">
