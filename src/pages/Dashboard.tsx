@@ -35,17 +35,41 @@ interface MarcadorSVGProps {
   color: string;
 }
 
-// ── pega esto al final de Dashboard.tsx, después de la línea 38 ──
+const MarcadorSVG: React.FC<MarcadorSVGProps> = ({ x1, y1, x2, y2, color }) => {
+  const [t, setT] = useState(0);
+  const rafRef = useRef<number | null>(null);
+  const inicioRef = useRef<number | null>(null);
+  const duracion = 4000;
 
-function MarcadorSVG({ x1, y1, x2, y2, color }: MarcadorSVGProps) {
+  useEffect(() => {
+    const animar = (timestamp: number) => {
+      if (!inicioRef.current) inicioRef.current = timestamp;
+      const elapsed = timestamp - inicioRef.current;
+      const progress = Math.min(elapsed / duracion, 1);
+      setT(progress);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animar);
+      } else {
+        setTimeout(() => {
+          inicioRef.current = null;
+          setT(0);
+          rafRef.current = requestAnimationFrame(animar);
+        }, 1000);
+      }
+    };
+    rafRef.current = requestAnimationFrame(animar);
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+  }, [x1, y1, x2, y2]);
+
+  const cx = x1 + (x2 - x1) * t;
+  const cy = y1 + (y2 - y1) * t;
+
   return (
-    <circle r="6" fill={color} opacity="0.9">
-      <animateMotion dur="3s" repeatCount="indefinite">
-        <mpath xlinkHref="#ruta-linea" />
-      </animateMotion>
+    <circle cx={cx} cy={cy} r={6} fill={color} stroke="white" strokeWidth={2}>
+      <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite" />
     </circle>
   );
-}
+};
 
 export default function Dashboard() {
   return (
