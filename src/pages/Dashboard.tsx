@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Layout from '../components/Layout';
+import MapaDespacho from '../components/MapaInicio';
 import mockData from '../data/MockData.json';
 import { Package, Truck, CheckCircle, Clock } from 'lucide-react';
 
@@ -19,137 +20,76 @@ const ENVIOS_ACTIVOS = mockData.rutas.map((r: any, idx: number) => ({
 const enTransito = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'En tránsito').length;
 const completados = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'Completado').length;
 
-// ── Coordenadas en el SVG del mapa (posiciones relativas) ─────────
-const NODOS: Record<string, { x: number; y: number; label: string }> = {
-  'Pto. Montt':   { x: 200, y: 80,  label: 'Pto. Montt' },
-  'Puerto Montt': { x: 200, y: 80,  label: 'Pto. Montt' },
-  'Osorno':       { x: 220, y: 40,  label: 'Osorno' },
-  'Castro':       { x: 160, y: 180, label: 'Castro' },
-  'Santiago':     { x: 260, y: 320, label: 'Santiago' },
-};
-
-// ── Componente marcador animado sobre SVG ─────────────────────────
-interface MarcadorSVGProps {
-  x1: number; y1: number;
-  x2: number; y2: number;
-  color: string;
-}
-
-const MarcadorSVG: React.FC<MarcadorSVGProps> = ({ x1, y1, x2, y2, color }) => {
-  const [t, setT] = useState(0);
-  const rafRef = useRef<number | null>(null);
-  const inicioRef = useRef<number | null>(null);
-  const duracion = 4000;
-
-  useEffect(() => {
-    const animar = (timestamp: number) => {
-      if (!inicioRef.current) inicioRef.current = timestamp;
-      const elapsed = timestamp - inicioRef.current;
-      const progress = Math.min(elapsed / duracion, 1);
-      setT(progress);
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(animar);
-      } else {
-        setTimeout(() => {
-          inicioRef.current = null;
-          setT(0);
-          rafRef.current = requestAnimationFrame(animar);
-        }, 1000);
-      }
-    };
-    rafRef.current = requestAnimationFrame(animar);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [x1, y1, x2, y2]);
-
-  const cx = x1 + (x2 - x1) * t;
-  const cy = y1 + (y2 - y1) * t;
-
-  return (
-    <circle cx={cx} cy={cy} r={6} fill={color} stroke="white" strokeWidth={2}>
-      <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite" />
-    </circle>
-  );
-};
+// Solo los envíos EN TRÁNSITO se muestran en el panel lateral "Envíos Activos"
+const enviosActivos = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'En tránsito');
 
 export default function Dashboard() {
   return (
     <Layout>
       <div className="p-6 space-y-6">
 
-        {/* Tarjetas de estadísticas */}
+        {/* Tarjetas de estadísticas — orden y textos calcados del mockup */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
-            <Package className="text-pink-500" size={28} />
+            <Package className="text-blue-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Total ítems</p>
+              <p className="text-xs text-gray-500">Inventario Total</p>
               <p className="text-xl font-bold">{totalItems}</p>
+              <p className="text-xs text-gray-400">{pesoTotal.toFixed(1)}kg / {volumenTotal.toFixed(1)}m³</p>
             </div>
           </div>
+
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
-            <Truck className="text-orange-400" size={28} />
+            <Truck className="text-purple-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">En tránsito</p>
-              <p className="text-xl font-bold">{enTransito}</p>
+              <p className="text-xs text-gray-500">Transportes Activos</p>
+              <p className="text-xl font-bold">{totalRutas}</p>
+              <p className="text-xs text-gray-400">{enTransito} en tránsito</p>
             </div>
           </div>
+
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
             <CheckCircle className="text-green-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Completados</p>
+              <p className="text-xs text-gray-500">Entregados</p>
               <p className="text-xl font-bold">{completados}</p>
+              <p className="text-xs text-gray-400">Completados</p>
             </div>
           </div>
+
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
-            <Clock className="text-blue-400" size={28} />
+            <Clock className="text-orange-400" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Rutas totales</p>
-              <p className="text-xl font-bold">{totalRutas}</p>
+              <p className="text-xs text-gray-500">En Tránsito</p>
+              <p className="text-xl font-bold">{enTransito}</p>
+              <p className="text-xs text-gray-400">Activos ahora</p>
             </div>
           </div>
         </div>
 
-        {/* Tabla de envíos */}
-        <div className="bg-white rounded-xl shadow p-4">
-          <h2 className="text-lg font-semibold mb-3">Envíos activos</h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="pb-2">ID</th>
-                <th className="pb-2">Origen → Destino</th>
-                <th className="pb-2">Vehículo</th>
-                <th className="pb-2">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ENVIOS_ACTIVOS.map((envio) => (
-                <tr key={envio.id} className="border-b last:border-0">
-                  <td className="py-2 font-mono">{envio.id}</td>
-                  <td className="py-2">{envio.ruta.origen} → {envio.ruta.destino}</td>
-                  <td className="py-2">{envio.vehiculo}</td>
-                  <td className="py-2">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      envio.estado === 'En tránsito'
-                        ? 'bg-orange-100 text-orange-700'
-                        : 'bg-green-100 text-green-700'
-                    }`}>
+        {/* Mapa + panel de envíos activos */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <MapaDespacho />
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-4">
+            <h2 className="font-semibold mb-3">Envíos Activos</h2>
+            {enviosActivos.length === 0 ? (
+              <p className="text-sm text-gray-400">No hay envíos activos</p>
+            ) : (
+              <ul className="space-y-3">
+                {enviosActivos.map((envio) => (
+                  <li key={envio.id} className="text-sm border-b pb-2 last:border-0">
+                    <p className="font-mono">{envio.id}</p>
+                    <p className="text-gray-500">{envio.ruta.origen} → {envio.ruta.destino}</p>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
                       {envio.estado}
                     </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Stats extras */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">Peso total cargado</p>
-            <p className="text-2xl font-bold">{pesoTotal} <span className="text-sm font-normal text-gray-400">kg</span></p>
-          </div>
-          <div className="bg-white rounded-xl shadow p-4">
-            <p className="text-xs text-gray-500 mb-1">Volumen total</p>
-            <p className="text-2xl font-bold">{volumenTotal} <span className="text-sm font-normal text-gray-400">m³</span></p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 

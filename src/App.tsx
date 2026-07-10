@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import GestorCarga from './pages/GestorCarga';
 import CentroDespacho from './pages/CentroDespacho';
 import EstadoEntrega from './pages/EstadoEntrega';
+import 'leaflet/dist/leaflet.css';
 
 function App() {
   return (
