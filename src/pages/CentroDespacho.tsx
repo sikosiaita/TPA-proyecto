@@ -153,7 +153,7 @@ const CentroDespacho: React.FC = () => {
               <h3 className="font-bold text-gray-800 text-sm mb-2">Ítems a despachar</h3>
               <div className="flex-grow overflow-y-auto pr-1">
                 <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm">
-                  <div className="flex flex-col gap-2 max-h-[265px] overflow-y-auto pr-2">
+                  <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
                     {mockData.item.map((item) => (
                       <div key={item.id} className="flex flex-col">
                         <button

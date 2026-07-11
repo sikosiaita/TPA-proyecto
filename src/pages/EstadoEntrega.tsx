@@ -29,7 +29,7 @@ const EstadoEntrega: React.FC = () => {
 
   return (
     <Layout>
-      <div className="w-full h-full min-h-screen flex flex-col bg-[#F3F4F6] text-gray-800">
+      <div className="w-full h-full flex flex-col bg-[#F3F4F6] text-gray-800">
         
         {/* TÍTULO */}
         <div className="px-8 py-5 border-b border-gray-200 bg-[#F3F4F6]">

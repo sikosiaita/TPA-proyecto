@@ -31,17 +31,14 @@ const GestorCarga: React.FC = () => {
   };
 
   const toggleCosto = (itemId: string, costo: 'seguro' | 'fragil' | 'impuesto') => {
-    setCostosSeleccionados(prev => ({
-      ...prev,
-      [itemId]: {
-        seguro: false,
-        fragil: false,
-        impuesto: false,
-        ...prev[itemId],
-        [costo]: !prev[itemId]?.[costo],
-      }
-    }));
-  };
+  setCostosSeleccionados(prev => ({
+    ...prev,
+    [itemId]: {
+      ...(prev[itemId] ?? { seguro: false, fragil: false, impuesto: false }),
+      [costo]: !(prev[itemId]?.[costo] ?? false),
+    }
+  }));
+};
 
   const calcularCostoAdicional = (itemId: string) => {
     const sel = costosSeleccionados[itemId];
@@ -193,7 +190,7 @@ const GestorCarga: React.FC = () => {
               <h3 className="font-bold text-gray-800 text-sm mb-2">Items</h3>
               <div className="flex-grow overflow-y-auto pr-1">
                 <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm">
-                  <div className="flex flex-col gap-2 max-h-[265px] overflow-y-auto pr-2">
+                  <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
                     {mockData.item.map((item) => (
                       <div key={item.id} className="flex flex-col">
                         <button
@@ -298,7 +295,7 @@ const GestorCarga: React.FC = () => {
                 <div></div>
               </div>
 
-              <div className="flex-grow space-y-2 overflow-y-auto max-h-[280px] pr-1">
+              <div className="flex-grow space-y-2 overflow-y-auto max-h-[350px] pr-1">
                 {listaItems.length === 0 ? (
                   <div className="bg-white/70 h-full min-h-[200px] border-2 border-dashed border-pink-300 rounded-lg flex items-center justify-center text-gray-500 text-sm italic p-4 text-center">
                     El contenedor está vacío. <br /> Agrega ítems desde el panel izquierdo.
