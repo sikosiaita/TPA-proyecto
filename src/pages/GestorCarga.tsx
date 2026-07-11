@@ -1,9 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
-//IMPORTAR LAS CLASES
-import { Contenedor } from '../domain/carga/Contenedor';
-import { Item } from '../domain/carga/Item';
+import { cargaService, CAPACIDAD_MAX, ItemCargado } from '../domain/carga/CargaService';
 
 const TARIFA_KG = 300;
 const COSTO_SEGURO = 1000;
@@ -13,9 +11,20 @@ const COSTO_IMPUESTO = 300;
 const GestorCarga: React.FC = () => {
 
   const [itemExpandido, setItemExpandido] = useState<string | null>(null);
-  const contenedorPrincipal = useRef(new Contenedor("CONT-001", "Pallet"));
-  const [capacidadRestante, setCapacidadRestante] = useState<number>(1);
-  const [listaItems, setListaItems] = useState<any[]>([]);
+
+  // ── Carga compartida (Observer), en vez de estado local aislado ──
+  const [listaItems, setListaItems] = useState<ItemCargado[]>(() => cargaService.getItems());
+
+  useEffect(() => {
+    const actualizarObservador = (itemsActualizados: ItemCargado[]) => {
+      setListaItems(itemsActualizados);
+    };
+    cargaService.suscribir(actualizarObservador);
+    return () => cargaService.desuscribir(actualizarObservador);
+  }, []);
+
+  const volumenTotal = listaItems.reduce((acc, i) => acc + i.volumen, 0);
+  const capacidadRestante = CAPACIDAD_MAX - volumenTotal;
 
   // Costos adicionales por ítem expandido
   const [costosSeleccionados, setCostosSeleccionados] = useState<{
@@ -24,21 +33,21 @@ const GestorCarga: React.FC = () => {
 
   // Estado para el modal de confirmación
   const [modalEstado, setModalEstado] = useState<'oculto' | 'visible' | 'saliendo'>('oculto');
-  const modalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modalTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleItem = (id: string) => {
     setItemExpandido(itemExpandido === id ? null : id);
   };
 
   const toggleCosto = (itemId: string, costo: 'seguro' | 'fragil' | 'impuesto') => {
-  setCostosSeleccionados(prev => ({
-    ...prev,
-    [itemId]: {
-      ...(prev[itemId] ?? { seguro: false, fragil: false, impuesto: false }),
-      [costo]: !(prev[itemId]?.[costo] ?? false),
-    }
-  }));
-};
+    setCostosSeleccionados(prev => ({
+      ...prev,
+      [itemId]: {
+        ...(prev[itemId] ?? { seguro: false, fragil: false, impuesto: false }),
+        [costo]: !(prev[itemId]?.[costo] ?? false),
+      }
+    }));
+  };
 
   const calcularCostoAdicional = (itemId: string) => {
     const sel = costosSeleccionados[itemId];
@@ -49,38 +58,21 @@ const GestorCarga: React.FC = () => {
   };
 
   const handleAgregarAlContenedor = (itemJson: any) => {
-    if (itemJson.volumen > capacidadRestante) {
+    const precioBase = Math.round(itemJson.pesoKg * TARIFA_KG);
+    const costoAdicional = calcularCostoAdicional(itemJson.id);
+
+    const agregado = cargaService.agregarItem(itemJson, precioBase, costoAdicional);
+
+    if (!agregado) {
       alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m³ de capacidad.`);
       return;
     }
 
-    const nuevoItem = new Item(
-      itemJson.id,
-      itemJson.descripcion,
-      itemJson.volumen
-    );
-
-    const precioBase = Math.round(itemJson.pesoKg * TARIFA_KG);
-    const costoAdicional = calcularCostoAdicional(itemJson.id);
-    const total = precioBase + costoAdicional;
-
-    setListaItems(prev => [...prev, {
-      id: itemJson.id,
-      tipo: itemJson.tipo,
-      volumen: itemJson.volumen,
-      precioBase,
-      costoAdicional,
-      total
-    }]);
-
-    contenedorPrincipal.current.agregarComponente(nuevoItem);
-    setCapacidadRestante(prev => prev - itemJson.volumen);
-    console.log(`Ítem agregado. Precio base: $${precioBase}, Costo adicional: $${costoAdicional}, Total: $${total}`);
+    console.log(`Ítem agregado. Precio base: $${precioBase}, Costo adicional: $${costoAdicional}`);
   };
 
-  const handleEliminarItem = (index: number, volumen: number) => {
-    setListaItems(prev => prev.filter((_, i) => i !== index));
-    setCapacidadRestante(prev => Math.min(1, prev + volumen));
+  const handleEliminarItem = (index: number) => {
+    cargaService.eliminarItem(index);
   };
 
   const handleGuardar = () => {
@@ -315,7 +307,7 @@ const GestorCarga: React.FC = () => {
                         <div className="font-bold text-gray-800">${item.total.toLocaleString('es-CL')}</div>
                         <div className="flex justify-center">
                           <button
-                            onClick={() => handleEliminarItem(index, item.volumen)}
+                            onClick={() => handleEliminarItem(index)}
                             className="text-gray-400 hover:text-red-500 transition-colors font-bold text-base leading-none"
                             title="Eliminar ítem"
                           >
@@ -343,7 +335,7 @@ const GestorCarga: React.FC = () => {
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-in-out"
                       style={{
-                        width: `${(capacidadRestante / 1) * 100}%`,
+                        width: `${(capacidadRestante / CAPACIDAD_MAX) * 100}%`,
                         backgroundColor:
                           capacidadRestante > 0.5 ? '#FFAEC1'
                           : capacidadRestante > 0.2 ? '#ED93B1'
@@ -352,7 +344,7 @@ const GestorCarga: React.FC = () => {
                     />
                   </div>
                   <span className="text-xs text-gray-600">
-                    {((capacidadRestante / 1) * 100).toFixed(0)}% disponible
+                    {((capacidadRestante / CAPACIDAD_MAX) * 100).toFixed(0)}% disponible
                   </span>
                 </div>
 
@@ -381,7 +373,8 @@ const GestorCarga: React.FC = () => {
               {/* Botón Guardar */}
               <button
                 onClick={handleGuardar}
-                className="bg-[#D4537E] text-white py-2 px-8 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#993556] transition-colors text-sm w-fit"
+                disabled={listaItems.length === 0}
+                className="bg-[#D4537E] text-white py-2 px-8 rounded-lg font-bold uppercase tracking-widest shadow hover:bg-[#993556] transition-colors text-sm w-fit disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Guardar
               </button>
