@@ -268,7 +268,7 @@ const CentroDespacho: React.FC = () => {
                       </div>
 
                       <span className="font-bold text-gray-800 text-sm">{v.nombre}</span>
-                      <span className="text-[10px] text-gray-400">{v.descripcion}</span>
+                      <span className="text-[10px] text-gray-600">{v.descripcion}</span>
                       <div className="text-xs text-gray-600 mt-1 flex flex-col gap-0.5">
                         <span>Base: <span className="font-bold">${v.costoBase.toLocaleString('es-CL')}</span></span>
                         <span>+${v.costoPorKm.toLocaleString('es-CL')}/km</span>
@@ -312,7 +312,7 @@ const CentroDespacho: React.FC = () => {
 
               {/* Resumen de costos */}
               <div className="bg-white border border-gray-200 rounded-xl p-4 flex-grow flex flex-col gap-3 shadow-sm">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Resumen de costos</span>
+                <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Resumen de costos</span>
                 {vehiculoSeleccionado ? (
                   <div className="flex flex-col gap-1.5 text-xs text-gray-600">
                     <div className="flex justify-between">
@@ -329,7 +329,7 @@ const CentroDespacho: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 italic">Selecciona un vehículo para ver el costo.</p>
+                  <p className="text-xs text-gray-500 italic">Selecciona un vehículo para ver el costo.</p>
                 )}
               </div>
 

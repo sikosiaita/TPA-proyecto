@@ -33,36 +33,36 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
             <Package className="text-blue-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Inventario Total</p>
+              <p className="text-xs text-gray-700">Inventario Total</p>
               <p className="text-xl font-bold">{totalItems}</p>
-              <p className="text-xs text-gray-400">{pesoTotal.toFixed(1)}kg / {volumenTotal.toFixed(1)}m³</p>
+              <p className="text-xs text-gray-600">{pesoTotal.toFixed(1)}kg / {volumenTotal.toFixed(1)}m³</p>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
             <Truck className="text-purple-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Transportes Activos</p>
+              <p className="text-xs text-gray-700">Transportes Activos</p>
               <p className="text-xl font-bold">{totalRutas}</p>
-              <p className="text-xs text-gray-400">{enTransito} en tránsito</p>
+              <p className="text-xs text-gray-600">{enTransito} en tránsito</p>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
             <CheckCircle className="text-green-500" size={28} />
             <div>
-              <p className="text-xs text-gray-500">Entregados</p>
+              <p className="text-xs text-gray-700">Entregados</p>
               <p className="text-xl font-bold">{completados}</p>
-              <p className="text-xs text-gray-400">Completados</p>
+              <p className="text-xs text-gray-600">Completados</p>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
             <Clock className="text-orange-400" size={28} />
             <div>
-              <p className="text-xs text-gray-500">En Tránsito</p>
+              <p className="text-xs text-gray-700">En Tránsito</p>
               <p className="text-xl font-bold">{enTransito}</p>
-              <p className="text-xs text-gray-400">Activos ahora</p>
+              <p className="text-xs text-gray-600">Activos ahora</p>
             </div>
           </div>
         </div>
@@ -76,13 +76,13 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl shadow p-4">
             <h2 className="font-semibold mb-3">Envíos Activos</h2>
             {enviosActivos.length === 0 ? (
-              <p className="text-sm text-gray-400">No hay envíos activos</p>
+              <p className="text-sm text-gray-600">No hay envíos activos</p>
             ) : (
               <ul className="space-y-3">
                 {enviosActivos.map((envio) => (
                   <li key={envio.id} className="text-sm border-b pb-2 last:border-0">
                     <p className="font-mono">{envio.id}</p>
-                    <p className="text-gray-500">{envio.ruta.origen} → {envio.ruta.destino}</p>
+                    <p className="text-gray-700">{envio.ruta.origen} → {envio.ruta.destino}</p>
                     <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
                       {envio.estado}
                     </span>

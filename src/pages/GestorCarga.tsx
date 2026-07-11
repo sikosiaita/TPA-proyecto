@@ -53,7 +53,7 @@ const GestorCarga: React.FC = () => {
 
   const handleAgregarAlContenedor = (itemJson: any) => {
     if (itemJson.volumen > capacidadRestante) {
-      alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m^3 de capacidad.`);
+      alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m³ de capacidad.`);
       return;
     }
 
@@ -182,7 +182,7 @@ const GestorCarga: React.FC = () => {
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">Tipo de contenedor</label>
                 <select className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer" defaultValue="pallet">
-                  <option value="" disabled>Seleccione un centro...</option>
+                  <option value="" disabled>Seleccione un tipo de contenedor...</option>
                   <option value="pallet">Pallet</option>
                   <option value="caja">Caja</option>
                 </select>
@@ -211,14 +211,14 @@ const GestorCarga: React.FC = () => {
                             <div className="flex gap-4 mb-4 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
                               <p>Tipo: <span className="text-gray-800">{item.tipo}</span></p>
                               <p>Peso: <span className="text-gray-800">{item.pesoKg} kg</span></p>
-                              <p>Volumen: <span className="text-gray-800">{item.volumen} m^3</span></p>
+                              <p>Volumen: <span className="text-gray-800">{item.volumen} m³</span></p>
                             </div>
 
                             {/* Precio base calculado */}
                             <div className="mb-3 pl-2">
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-700">
                                 Precio base: <span className="font-bold text-gray-800">${Math.round(item.pesoKg * TARIFA_KG).toLocaleString('es-CL')}</span>
-                                <span className="text-gray-400 ml-1">({item.pesoKg} kg × ${TARIFA_KG})</span>
+                                <span className="text-gray-600 ml-1">({item.pesoKg} kg × ${TARIFA_KG})</span>
                               </p>
                             </div>
 
@@ -235,7 +235,7 @@ const GestorCarga: React.FC = () => {
                                     />
                                     Seguro
                                   </div>
-                                  <span className="text-xs text-gray-400">+${COSTO_SEGURO.toLocaleString('es-CL')}</span>
+                                  <span className="text-xs text-gray-600">+${COSTO_SEGURO.toLocaleString('es-CL')}</span>
                                 </label>
                                 <label className="bg-gray-100 hover:bg-gray-200 cursor-pointer px-3 py-1 rounded text-sm text-gray-700 flex items-center justify-between gap-2 transition">
                                   <div className="flex items-center gap-2">
@@ -247,7 +247,7 @@ const GestorCarga: React.FC = () => {
                                     />
                                     Manejo Frágil
                                   </div>
-                                  <span className="text-xs text-gray-400">+${COSTO_FRAGIL.toLocaleString('es-CL')}</span>
+                                  <span className="text-xs text-gray-600">+${COSTO_FRAGIL.toLocaleString('es-CL')}</span>
                                 </label>
                                 <label className="bg-gray-100 hover:bg-gray-200 cursor-pointer px-3 py-1 rounded text-sm text-gray-700 flex items-center justify-between gap-2 transition">
                                   <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ const GestorCarga: React.FC = () => {
                                     />
                                     Impuesto Territorial
                                   </div>
-                                  <span className="text-xs text-gray-400">+${COSTO_IMPUESTO.toLocaleString('es-CL')}</span>
+                                  <span className="text-xs text-gray-600">+${COSTO_IMPUESTO.toLocaleString('es-CL')}</span>
                                 </label>
                               </div>
                             </div>
@@ -288,7 +288,7 @@ const GestorCarga: React.FC = () => {
 
             {/* TABLA */}
             <div className="bg-[#FFAEC1] p-5 rounded-xl flex-grow min-h-[350px] flex flex-col mb-6">
-              <div className="grid grid-cols-7 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-700 text-xs mb-3 shadow-sm uppercase tracking-wider">
+              <div className="grid grid-cols-7 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-800 text-xs mb-3 shadow-sm uppercase tracking-wider">
                 <div>Código</div>
                 <div>Tipo</div>
                 <div>Volumen</div>
@@ -340,7 +340,7 @@ const GestorCarga: React.FC = () => {
 
                 {/* Capacidad restante */}
                 <div className="bg-white border border-gray-200 rounded-xl p-4 w-56 flex flex-col gap-2 shadow-sm">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Capacidad restante</span>
+                  <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">Capacidad restante</span>
                   <span className="text-2xl font-bold text-gray-800">{capacidadRestante.toFixed(2)} m³</span>
                   <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
@@ -354,14 +354,14 @@ const GestorCarga: React.FC = () => {
                       }}
                     />
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-600">
                     {((capacidadRestante / 1) * 100).toFixed(0)}% disponible
                   </span>
                 </div>
 
                 {/* Resumen de costos */}
                 <div className="bg-white border border-gray-200 rounded-xl p-4 flex-grow flex flex-col gap-3 shadow-sm">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Resumen de costos</span>
+                  <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">Resumen de costos</span>
 
                   <div className="flex flex-col gap-1.5 text-xs text-gray-600">
                     <div className="flex justify-between">
