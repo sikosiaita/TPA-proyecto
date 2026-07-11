@@ -93,7 +93,7 @@ export default function MapaDespacho() {
   const posTransporte = useSimulacionTransporte(CENTROS[0], CENTROS[2]); // Pto Montt → Castro
 
   return (
-    <div className="rounded-xl overflow-hidden shadow" style={{ height: '400px', width: '100%' }}>
+    <div className="rounded-xl overflow-hidden shadow" style={{ height: '600px', width: '100%' }}> 
       <MapContainer
         center={[-41.4693, -72.9424]}
         zoom={7}
