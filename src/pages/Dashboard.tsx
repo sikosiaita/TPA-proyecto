@@ -1,29 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import MapaDespacho from '../components/MapaInicio';
 import mockData from '../data/MockData.json';
+import { Envio } from '../domain/envio/Envio';
+import { envioService } from '../domain/envio/EnvioService';
+import { EstadoEnvio } from '../domain/envio/EstadoEnvio';
 import { Package, Truck, CheckCircle, Clock } from 'lucide-react';
 
-// ── Estadísticas derivadas del MockData ──────────────────────────
+// ── Estadísticas de inventario (catálogo general, MockData) ──────
 const totalItems = mockData.item.length;
 const pesoTotal = mockData.item.reduce((acc: number, i: any) => acc + i.pesoKg, 0);
 const volumenTotal = mockData.item.reduce((acc: number, i: any) => acc + i.volumen, 0);
-const totalRutas = mockData.rutas.length;
-
-const ENVIOS_ACTIVOS = mockData.rutas.map((r: any, idx: number) => ({
-  id: `ENV-00${idx + 1}`,
-  ruta: r,
-  estado: idx === 0 ? 'En tránsito' : 'Completado',
-  vehiculo: idx === 0 ? 'Camión' : 'Moto',
-}));
-
-const enTransito = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'En tránsito').length;
-const completados = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'Completado').length;
-
-// Solo los envíos EN TRÁNSITO se muestran en el panel lateral "Envíos Activos"
-const enviosActivos = ENVIOS_ACTIVOS.filter((e: any) => e.estado === 'En tránsito');
 
 export default function Dashboard() {
+  // ── Envíos REALES, sincronizados con el mismo EnvioService (Observer) que EstadoEntrega.tsx ──
+  const [listaEnvios, setListaEnvios] = useState<Envio[]>(() => envioService.getEnvios());
+
+  useEffect(() => {
+    const actualizarObservador = (enviosActualizados: Envio[]) => {
+      setListaEnvios(enviosActualizados);
+    };
+    envioService.suscribir(actualizarObservador);
+    return () => envioService.desuscribir(actualizarObservador);
+  }, []);
+
+  // ── Derivados desde los envíos reales, ya no desde mockData.rutas ──
+  const transportesActivos = listaEnvios.filter((e) => e.estaActivo()).length;
+  const enTransito = listaEnvios.filter((e) => e.estado === EstadoEnvio.EN_TRANSITO).length;
+  const entregados = listaEnvios.filter((e) => e.estado === EstadoEnvio.ENTREGADO).length;
+  const enviosActivos = listaEnvios.filter((e) => e.estaActivo());
+
   return (
     <Layout>
       <div className="p-6 space-y-6">
@@ -43,7 +49,7 @@ export default function Dashboard() {
             <Truck className="text-purple-500" size={28} />
             <div>
               <p className="text-xs text-gray-700">Transportes Activos</p>
-              <p className="text-xl font-bold">{totalRutas}</p>
+              <p className="text-xl font-bold">{transportesActivos}</p>
               <p className="text-xs text-gray-600">{enTransito} en tránsito</p>
             </div>
           </div>
@@ -52,7 +58,7 @@ export default function Dashboard() {
             <CheckCircle className="text-green-500" size={28} />
             <div>
               <p className="text-xs text-gray-700">Entregados</p>
-              <p className="text-xl font-bold">{completados}</p>
+              <p className="text-xl font-bold">{entregados}</p>
               <p className="text-xs text-gray-600">Completados</p>
             </div>
           </div>
@@ -82,7 +88,7 @@ export default function Dashboard() {
                 {enviosActivos.map((envio) => (
                   <li key={envio.id} className="text-sm border-b pb-2 last:border-0">
                     <p className="font-mono">{envio.id}</p>
-                    <p className="text-gray-700">{envio.ruta.origen} → {envio.ruta.destino}</p>
+                    <p className="text-gray-700">{envio.origen} → {envio.destino}</p>
                     <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
                       {envio.estado}
                     </span>
