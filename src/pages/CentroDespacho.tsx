@@ -5,13 +5,18 @@ import { VEHICULOS } from '../data/MockDataVehiculos';
 import { Transporte } from '../domain/transporte/Transporte';
 import { crearEstrategia } from '../domain/transporte/FactoryTransporte';
 import { envioService } from '../domain/envio/EnvioService';
-import { cargaService, ItemCargado } from '../domain/carga/CargaService';
+import { cargaService, ItemCargado, CargaState, TipoContenedor } from '../domain/carga/CargaService';
 
 type VehiculoKey = keyof typeof VEHICULOS;
 
+const ETIQUETA_CONTENEDOR: Record<TipoContenedor, string> = {
+  pallet: 'Pallet',
+  caja: 'Caja',
+};
+
 const CentroDespacho: React.FC = () => {
 
-  const [rutaSeleccionada, setRutaSeleccionada] = useState<string>(mockData.rutas[0].id);
+  const [itemExpandido, setItemExpandido] = useState<string | null>(null);
   const [vehiculoSeleccionado, setVehiculoSeleccionado] = useState<VehiculoKey | null>(null);
 
   const [modalEstado, setModalEstado] = useState<'oculto' | 'visible' | 'saliendo'>('oculto');
@@ -19,30 +24,43 @@ const CentroDespacho: React.FC = () => {
 
   // ── Carga compartida: ya no se arma acá, se lee de lo que hiciste en Gestor de Carga ──
   const [itemsCarga, setItemsCarga] = useState<ItemCargado[]>(() => cargaService.getItems());
+  const [rutaId, setRutaId] = useState<string>(() => cargaService.getRutaId());
+  const [tipoContenedor, setTipoContenedor] = useState<TipoContenedor>(() => cargaService.getTipoContenedor());
 
   useEffect(() => {
-    const actualizarObservador = (itemsActualizados: ItemCargado[]) => {
-      setItemsCarga(itemsActualizados);
+    const actualizarObservador = (estado: CargaState) => {
+      setItemsCarga(estado.items);
+      setRutaId(estado.rutaId);
+      setTipoContenedor(estado.tipoContenedor);
     };
     cargaService.suscribir(actualizarObservador);
     return () => cargaService.desuscribir(actualizarObservador);
   }, []);
 
-  const ruta = mockData.rutas.find(r => r.id === rutaSeleccionada) ?? mockData.rutas[0];
+  // La ruta ya no se elige aquí — solo se muestra la que se fijó en Gestor de Carga.
+  const ruta = mockData.rutas.find(r => r.id === rutaId) ?? mockData.rutas[0];
 
   const volumenTotal = itemsCarga.reduce((acc, i) => acc + i.volumen, 0);
-  const tiposEnCarga = [...new Set(itemsCarga.map(i => i.tipo))];
 
-  const vehiculoRecomendado = (): VehiculoKey => {
-    if (tiposEnCarga.includes('Pallet') || volumenTotal > 0.5) return 'camion';
-    if (tiposEnCarga.includes('Caja')) return 'moto';
-    return 'dron';
+  // El tipo de contenedor (Pallet/Caja) ahora SÍ entra al cálculo de qué vehículo puede llevarla,
+  // igual que los tipos de los ítems (Sobre/Caja). Por eso un Pallet, aunque vaya casi vacío,
+  // queda filtrado a solo Camión (es el único con 'Pallet' en tiposPermitidos).
+  const tiposEnCarga = [...new Set([ETIQUETA_CONTENEDOR[tipoContenedor], ...itemsCarga.map(i => i.tipo)])];
+
+  const toggleItem = (id: string) => {
+    setItemExpandido(itemExpandido === id ? null : id);
   };
 
   const vehiculoDisponible = (key: VehiculoKey) => {
     const v = VEHICULOS[key];
     if (volumenTotal > v.capacidadMax) return false;
     return tiposEnCarga.every(t => v.tiposPermitidos.includes(t as any));
+  };
+
+  // Recomienda el vehículo más pequeño/económico que sea capaz de llevar la carga completa.
+  const vehiculoRecomendado = (): VehiculoKey | null => {
+    const orden: VehiculoKey[] = ['dron', 'moto', 'camion'];
+    return orden.find(key => vehiculoDisponible(key)) ?? null;
   };
 
   const calcularCostoVehiculo = (key: VehiculoKey) => {
@@ -58,12 +76,7 @@ const CentroDespacho: React.FC = () => {
   const handleDespachar = () => {
     if (!vehiculoSeleccionado) return;
 
-    const rutaReal = mockData.rutas.find(r => r.id === rutaSeleccionada);
-    const origenFormulario = rutaReal?.origen ?? 'Origen Desconocido';
-    const destinoFormulario = rutaReal?.destino ?? 'Origen Desconocido';
-    const transporteFormulario = vehiculoSeleccionado;
-
-    envioService.crearEnvio(origenFormulario, destinoFormulario, transporteFormulario);
+    envioService.crearEnvio(ruta.origen, ruta.destino, vehiculoSeleccionado);
 
     // La carga ya se convirtió en un Envío: se vacía para el próximo despacho.
     cargaService.vaciar();
@@ -131,43 +144,70 @@ const CentroDespacho: React.FC = () => {
           <div className="lg:col-span-5 border-r border-gray-200 flex flex-col h-full">
 
             <div className="p-6 pb-2">
-              {/* SELECTOR DE RUTA */}
+              {/* Ruta — de solo lectura, ya fijada en Gestor de Carga */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">Ruta de despacho</label>
-                <select
-                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
-                  value={rutaSeleccionada}
-                  onChange={e => setRutaSeleccionada(e.target.value)}
-                >
-                  {mockData.rutas.map(r => (
-                    <option key={r.id} value={r.id}>
-                      {r.origen} → {r.destino} ({r.distanciaKm} km)
-                    </option>
-                  ))}
-                </select>
+                <div className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 rounded-md shadow-sm flex items-center justify-between">
+                  <span>{ruta.origen} → {ruta.destino}</span>
+                  <span className="text-xs text-gray-500">{ruta.distanciaKm} km</span>
+                </div>
+                <span className="text-[11px] text-gray-400">Se elige en Gestor de Carga.</span>
+              </div>
+
+              {/* Tipo de contenedor — de solo lectura, ya fijado en Gestor de Carga */}
+              <div className="flex flex-col gap-2 mb-4">
+                <label className="font-bold text-gray-800 text-sm">Tipo de contenedor</label>
+                <div className="w-full bg-gray-50 border border-gray-200 text-gray-700 py-1.5 px-3 rounded-md shadow-sm">
+                  {ETIQUETA_CONTENEDOR[tipoContenedor]}
+                </div>
               </div>
             </div>
 
-            {/* CARGA ARMADA EN GESTOR DE CARGA (solo lectura) */}
+            {/* LISTA DE ÍTEMS — solo lectura */}
             <div className="px-6 pb-6 flex-grow flex flex-col overflow-hidden">
-              <h3 className="font-bold text-gray-800 text-sm mb-2">Carga a despachar</h3>
+              <h3 className="font-bold text-gray-800 text-sm mb-2">Ítems a despachar</h3>
               <div className="flex-grow overflow-y-auto pr-1">
-                {itemsCarga.length === 0 ? (
-                  <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center text-gray-500 text-sm italic bg-white">
-                    Aún no has armado ninguna carga.<br />
-                    Ve a <span className="font-bold text-gray-700">Gestor de Carga</span> para agregar ítems.
-                  </div>
-                ) : (
-                  <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
-                    {itemsCarga.map((item) => (
-                      <div key={item.id} className="flex justify-between items-center text-sm px-3 py-2 rounded-md bg-gray-50 border border-gray-200">
-                        <span className="font-bold text-gray-800">{item.id}</span>
-                        <span className="text-gray-600">{item.tipo}</span>
-                        <span className="text-gray-600">{item.volumen} m³</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div className="border border-gray-200 bg-white p-2 rounded-lg shadow-sm">
+                  {itemsCarga.length === 0 ? (
+                    <div className="p-6 text-center text-gray-500 text-sm italic">
+                      Sin ítems.<br />Agrega desde Gestor de Carga.
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-2">
+                      {itemsCarga.map((item) => (
+                        <div key={item.id} className="flex flex-col">
+                          <button
+                            onClick={() => toggleItem(item.id)}
+                            className="text-left font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 py-1.5 px-2 rounded-md transition border border-gray-200 flex justify-between items-center"
+                          >
+                            {item.descripcion}
+                            <span className="text-xl text-gray-500 font-normal">
+                              {itemExpandido === item.id ? '-' : '+'}
+                            </span>
+                          </button>
+
+                          {itemExpandido === item.id && (
+                            <div className="border-t-2 border-b-2 border-black py-4 mt-2 px-2">
+                              <div className="flex gap-4 mb-4 text-[11px] font-bold text-gray-500 uppercase tracking-wide">
+                                <p>Tipo: <span className="text-gray-800">{item.tipo}</span></p>
+                                <p>Peso: <span className="text-gray-800">{item.pesoKg} kg</span></p>
+                                <p>Volumen: <span className="text-gray-800">{item.volumen} m³</span></p>
+                              </div>
+                              <div className="flex justify-center mt-2">
+                                <button
+                                  onClick={() => handleEliminarItem(itemsCarga.indexOf(item))}
+                                  className="border border-black text-black font-bold text-xs py-1.5 px-6 rounded-md uppercase tracking-wide hover:bg-gray-100 transition"
+                                >
+                                  Quitar
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -176,18 +216,16 @@ const CentroDespacho: React.FC = () => {
           {/* LADO DERECHO */}
           <div className="lg:col-span-7 p-6 flex flex-col self-start">
 
-            {/* TABLA DE ÍTEMS (misma forma que en GestorCarga: código/tipo/volumen/costos/total) */}
+            {/* TABLA DE ÍTEMS */}
             <div className="bg-[#FFAEC1] p-5 rounded-xl min-h-[220px] flex flex-col mb-6">
-              <div className="grid grid-cols-7 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-700 text-xs mb-3 shadow-sm uppercase tracking-wider">
+              <div className="grid grid-cols-5 gap-2 bg-white/40 p-2.5 rounded-lg text-center font-bold text-gray-700 text-xs mb-3 shadow-sm uppercase tracking-wider">
                 <div>Código</div>
                 <div>Tipo</div>
+                <div>Peso</div>
                 <div>Volumen</div>
-                <div>Precio B.</div>
-                <div>Costo A.</div>
-                <div>Total</div>
                 <div></div>
               </div>
-              <div className="flex-grow overflow-y-auto max-h-[280px] pr-1">
+              <div className="flex-grow overflow-y-auto max-h-[200px] pr-1">
                 {itemsCarga.length === 0 ? (
                   <div className="bg-white/70 min-h-[120px] border-2 border-dashed border-pink-300 rounded-lg flex items-center justify-center text-gray-500 text-sm italic p-4 text-center">
                     Sin ítems. Agrega desde Gestor de Carga.
@@ -195,13 +233,11 @@ const CentroDespacho: React.FC = () => {
                 ) : (
                   <div className="bg-white/90 rounded-lg p-2 shadow-sm divide-y divide-gray-100">
                     {itemsCarga.map((item, index) => (
-                      <div key={item.id + "-" + index} className="grid grid-cols-7 gap-2 py-3 text-center text-xs items-center hover:bg-gray-50/50 transition-colors">
+                      <div key={item.id + "-" + index} className="grid grid-cols-5 gap-2 py-3 text-center text-xs items-center hover:bg-gray-50/50 transition-colors">
                         <div className="font-bold text-gray-800">{item.id}</div>
                         <div className="font-bold text-gray-800">{item.tipo}</div>
+                        <div className="font-bold text-gray-800">{item.pesoKg} kg</div>
                         <div className="font-bold text-gray-800">{item.volumen} m³</div>
-                        <div className="font-bold text-gray-800">${item.precioBase.toLocaleString('es-CL')}</div>
-                        <div className="font-bold text-gray-800">${item.costoAdicional.toLocaleString('es-CL')}</div>
-                        <div className="font-bold text-gray-800">${item.total.toLocaleString('es-CL')}</div>
                         <div className="flex justify-center">
                           <button onClick={() => handleEliminarItem(index)} className="text-gray-400 hover:text-red-500 transition-colors font-bold text-base leading-none">×</button>
                         </div>
@@ -261,6 +297,9 @@ const CentroDespacho: React.FC = () => {
                           Total: ${costo.toLocaleString('es-CL')}
                         </span>
                       </div>
+                      {!disponible && (
+                        <span className="text-[10px] text-red-500 font-bold mt-1">No compatible con esta carga</span>
+                      )}
                     </button>
                   );
                 })}

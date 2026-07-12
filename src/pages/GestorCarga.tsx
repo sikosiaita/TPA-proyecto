@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import mockData from '../data/MockData.json';
-import { cargaService, CAPACIDAD_MAX, ItemCargado } from '../domain/carga/CargaService';
+import { cargaService, CAPACIDAD_MAX, ItemCargado, CargaState, TipoContenedor } from '../domain/carga/CargaService';
 
 const TARIFA_KG = 300;
 const COSTO_SEGURO = 1000;
@@ -12,14 +12,24 @@ const GestorCarga: React.FC = () => {
 
   const [itemExpandido, setItemExpandido] = useState<string | null>(null);
 
-  // ── Carga compartida (Observer), en vez de estado local aislado ──
+  // ── Carga compartida (Observer): ítems + ruta + tipo de contenedor ──
   const [listaItems, setListaItems] = useState<ItemCargado[]>(() => cargaService.getItems());
+  const [rutaId, setRutaId] = useState<string>(() => cargaService.getRutaId());
+  const [tipoContenedor, setTipoContenedorState] = useState<TipoContenedor>(() => cargaService.getTipoContenedor());
 
   useEffect(() => {
-    const actualizarObservador = (itemsActualizados: ItemCargado[]) => {
-      setListaItems(itemsActualizados);
+    const actualizarObservador = (estado: CargaState) => {
+      setListaItems(estado.items);
+      setRutaId(estado.rutaId);
+      setTipoContenedorState(estado.tipoContenedor);
     };
     cargaService.suscribir(actualizarObservador);
+
+    // Si todavía no hay ruta elegida (primera carga), parte con la primera disponible.
+    if (!cargaService.getRutaId()) {
+      cargaService.setRuta(mockData.rutas[0].id);
+    }
+
     return () => cargaService.desuscribir(actualizarObservador);
   }, []);
 
@@ -67,8 +77,6 @@ const GestorCarga: React.FC = () => {
       alert(`¡El ítem es muy grande! Solo queda ${capacidadRestante.toFixed(2)}m³ de capacidad.`);
       return;
     }
-
-    console.log(`Ítem agregado. Precio base: $${precioBase}, Costo adicional: $${costoAdicional}`);
   };
 
   const handleEliminarItem = (index: number) => {
@@ -148,33 +156,38 @@ const GestorCarga: React.FC = () => {
           <div className="lg:col-span-5 border-r border-gray-200 flex flex-col h-full">
 
             <div className="p-6 pb-2">
+              {/* Selector de ruta ÚNICO */}
               <div className="flex flex-col gap-2 mb-4">
-                <label className="font-bold text-gray-800 text-sm">Centro de distribución - Salida</label>
-                <select className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer" defaultValue="pto-montt">
-                  <option value="" disabled>Seleccione un centro...</option>
-                  <option value="pto-montt">Centro - Pto. Montt</option>
-                  <option value="castro">Centro - Castro</option>
-                  <option value="osorno">Centro - Osorno</option>
+                <label className="font-bold text-gray-800 text-sm">Ruta de despacho</label>
+                <select
+                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
+                  value={rutaId}
+                  onChange={e => cargaService.setRuta(e.target.value)}
+                >
+                  {mockData.rutas.map(r => (
+                    <option key={r.id} value={r.id}>
+                      {r.origen} → {r.destino} ({r.distanciaKm} km)
+                    </option>
+                  ))}
                 </select>
               </div>
 
-              <div className="flex flex-col gap-2 mb-4">
-                <label className="font-bold text-gray-800 text-sm">Centro de distribución - Destino</label>
-                <select className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer" defaultValue="castro">
-                  <option value="" disabled>Seleccione un centro...</option>
-                  <option value="pto-montt">Centro - Pto. Montt</option>
-                  <option value="castro">Centro - Castro</option>
-                  <option value="osorno">Centro - Osorno</option>
-                </select>
-              </div>
-
+              {/* Tipo de contenedor — AHORA FUNCIONAL: afecta qué vehículos pueden despachar la carga */}
               <div className="flex flex-col gap-2 mb-4">
                 <label className="font-bold text-gray-800 text-sm">Tipo de contenedor</label>
-                <select className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer" defaultValue="pallet">
-                  <option value="" disabled>Seleccione un tipo de contenedor...</option>
+                <select
+                  className="w-full bg-white border border-gray-200 text-gray-800 py-1.5 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 cursor-pointer"
+                  value={tipoContenedor}
+                  onChange={e => cargaService.setTipoContenedor(e.target.value as TipoContenedor)}
+                >
                   <option value="pallet">Pallet</option>
                   <option value="caja">Caja</option>
                 </select>
+                {tipoContenedor === 'pallet' && (
+                  <span className="text-[11px] text-gray-500">
+                    Un Pallet solo lo puede despachar un Camión, sin importar cuántos ítems tenga.
+                  </span>
+                )}
               </div>
             </div>
 

@@ -85,15 +85,29 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600">No hay envíos activos</p>
             ) : (
               <ul className="space-y-3">
-                {enviosActivos.map((envio) => (
-                  <li key={envio.id} className="text-sm border-b pb-2 last:border-0">
-                    <p className="font-mono">{envio.id}</p>
-                    <p className="text-gray-700">{envio.origen} → {envio.destino}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
-                      {envio.estado}
-                    </span>
-                  </li>
-                ))}
+                {enviosActivos.map((envio) => {
+                  // Asignar colores según el estado
+                  let colorClases = 'bg-gray-100 text-gray-700'; // Default
+                  
+                  if (envio.estado === EstadoEnvio.EN_TRANSITO) {
+                    colorClases = 'bg-orange-100 text-orange-700';
+                  } else if (envio.estado === EstadoEnvio.EN_PREPARACION) {
+                    // Usando tailwind con el color hexadecimal exacto solicitado
+                    colorClases = 'bg-[#3b82f6] text-white'; 
+                  } else if (envio.estado === EstadoEnvio.ENTREGADO) {
+                    colorClases = 'bg-green-100 text-green-700';
+                  }
+
+                  return (
+                    <li key={envio.id} className="text-sm border-b pb-2 last:border-0">
+                      <p className="font-mono">{envio.id}</p>
+                      <p className="text-gray-700">{envio.origen} → {envio.destino}</p>
+                      <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${colorClases}`}>
+                        {envio.estado}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>

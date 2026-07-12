@@ -4,16 +4,31 @@ import { Item } from './Item';
 // Capacidad máxima del contenedor principal (Pallet), en m³.
 export const CAPACIDAD_MAX = 1;
 
+export type TipoContenedor = 'pallet' | 'caja';
+
 export interface ItemCargado {
   id: string;
   tipo: string;
+  descripcion: string;
+  pesoKg: number;
   volumen: number;
   precioBase: number;
   costoAdicional: number;
   total: number;
 }
 
-type CargaObserver = (items: ItemCargado[]) => void;
+export interface CargaState {
+  items: ItemCargado[];
+  rutaId: string;
+  tipoContenedor: TipoContenedor;
+}
+
+type CargaObserver = (estado: CargaState) => void;
+
+const ETIQUETA_CONTENEDOR: Record<TipoContenedor, string> = {
+  pallet: 'Pallet',
+  caja: 'Caja',
+};
 
 class CargaService {
   // Jerarquía real (patrón Composite) — la misma instancia que antes vivía
@@ -23,12 +38,22 @@ class CargaService {
   // Espejo "plano" de los ítems agregados, para pintar tablas fácilmente en la UI.
   private items: ItemCargado[] = [];
 
+  // Ruta elegida UNA sola vez (en GestorCarga). CentroDespacho ya no la reselecciona.
+  private rutaId: string = '';
+
+  // Tipo de contenedor elegido (Pallet/Caja) — ahora sí afecta qué vehículos pueden llevarlo.
+  private tipoContenedor: TipoContenedor = 'pallet';
+
   private observadores: CargaObserver[] = [];
+
+  private getEstado(): CargaState {
+    return { items: [...this.items], rutaId: this.rutaId, tipoContenedor: this.tipoContenedor };
+  }
 
   // ── Observer: mismo patrón que EnvioService ──
   suscribir(callback: CargaObserver) {
     this.observadores.push(callback);
-    callback([...this.items]); // le pasa el estado actual de inmediato
+    callback(this.getEstado());
   }
 
   desuscribir(callback: CargaObserver) {
@@ -36,7 +61,7 @@ class CargaService {
   }
 
   private notificar() {
-    this.observadores.forEach((callback) => callback([...this.items]));
+    this.observadores.forEach((callback) => callback(this.getEstado()));
   }
 
   getItems(): ItemCargado[] {
@@ -45,6 +70,25 @@ class CargaService {
 
   getContenedor(): Contenedor {
     return this.contenedor;
+  }
+
+  getRutaId(): string {
+    return this.rutaId;
+  }
+
+  setRuta(rutaId: string) {
+    this.rutaId = rutaId;
+    this.notificar();
+  }
+
+  getTipoContenedor(): TipoContenedor {
+    return this.tipoContenedor;
+  }
+
+  setTipoContenedor(tipo: TipoContenedor) {
+    this.tipoContenedor = tipo;
+    this.contenedor.tipo = ETIQUETA_CONTENEDOR[tipo];
+    this.notificar();
   }
 
   getVolumenTotal(): number {
@@ -72,6 +116,8 @@ class CargaService {
     this.items.push({
       id: itemJson.id,
       tipo: itemJson.tipo,
+      descripcion: itemJson.descripcion,
+      pesoKg: itemJson.pesoKg,
       volumen: itemJson.volumen,
       precioBase,
       costoAdicional,
@@ -83,18 +129,23 @@ class CargaService {
   }
 
   eliminarItem(index: number) {
+    const item = this.items[index];
+    if (item) {
+      // Sincroniza también la jerarquía Composite real, no solo el espejo plano.
+      this.contenedor.removerComponente(item.id);
+    }
     this.items = this.items.filter((_, i) => i !== index);
     this.notificar();
-    // Nota: si Contenedor.ts expone un método para remover componentes,
-    // conviene llamarlo aquí también para que la jerarquía Composite real
-    // quede sincronizada 1:1 con este espejo plano.
   }
 
   /** Se llama después de un despacho exitoso: la carga ya se convirtió en un Envío. */
   vaciar() {
+    this.tipoContenedor = 'pallet';
     this.contenedor = new Contenedor('CONT-001', 'Pallet');
     this.items = [];
     this.notificar();
+    // rutaId se deja tal cual — normalmente se vuelve a fijar apenas
+    // arranca la próxima carga en GestorCarga.
   }
 }
 
