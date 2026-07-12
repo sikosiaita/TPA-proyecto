@@ -106,7 +106,7 @@ const EstadoEntrega: React.FC = () => {
                       <div className="font-semibold">{envio.id}</div>
                       <div>{envio.origen}</div>
                       <div>{envio.destino}</div>
-                      <div>{envio.transporte}</div>
+                      <div className="capitalize">{envio.transporte}</div>
                       
                       {/* Estado vinculando directamente el método de tu clase */}
                       <div className="flex items-center justify-start gap-2">

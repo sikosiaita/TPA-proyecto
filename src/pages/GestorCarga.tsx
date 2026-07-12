@@ -68,6 +68,13 @@ const GestorCarga: React.FC = () => {
   };
 
   const handleAgregarAlContenedor = (itemJson: any) => {
+    // --- NUEVO CANDADO SIMPLE ---
+    // Si el contenedor elegido es 'sobre', bloquea cualquier ítem que no sea tipo 'Sobre'
+    if (tipoContenedor === 'sobre' && itemJson.tipo !== 'Sobre') {
+      alert('¡Un sobre es muy pequeño para este ítem! Intenta con documentos.');
+      return;
+    }
+    // ----------------------------
     const precioBase = Math.round(itemJson.pesoKg * TARIFA_KG);
     const costoAdicional = calcularCostoAdicional(itemJson.id);
 
@@ -182,6 +189,7 @@ const GestorCarga: React.FC = () => {
                 >
                   <option value="pallet">Pallet</option>
                   <option value="caja">Caja</option>
+                  <option value="sobre">Sobre</option>
                 </select>
                 {tipoContenedor === 'pallet' && (
                   <span className="text-[11px] text-gray-500">

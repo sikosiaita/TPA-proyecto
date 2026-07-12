@@ -9,7 +9,7 @@ class EnvioService {
     new Envio('ENV-1042', 'Pto. Montt', 'Castro', 'Camión', EstadoEnvio.EN_TRANSITO, '3 hrs'),
     new Envio('ENV-2089', 'Castro', 'Dalcahue', 'Motocicleta', EstadoEnvio.EN_PREPARACION, '2 hrs'),
     new Envio('ENV-3114', 'Pto. Montt', 'Quellón', 'Camión', EstadoEnvio.ENTREGADO, '-'),
-    new Envio('ENV-4052', 'Quellón', 'Castro', 'Drone', EstadoEnvio.FALLIDO, '-')
+    new Envio('ENV-4052', 'Quellón', 'Castro', 'Dron', EstadoEnvio.FALLIDO, '-')
   ];
 
   private observadores: EnvioObserver[] = [];

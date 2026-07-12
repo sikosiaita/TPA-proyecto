@@ -4,7 +4,7 @@ import { Item } from './Item';
 // Capacidad máxima del contenedor principal (Pallet), en m³.
 export const CAPACIDAD_MAX = 1;
 
-export type TipoContenedor = 'pallet' | 'caja';
+export type TipoContenedor = 'pallet' | 'caja'| 'sobre';
 
 export interface ItemCargado {
   id: string;
@@ -28,6 +28,7 @@ type CargaObserver = (estado: CargaState) => void;
 const ETIQUETA_CONTENEDOR: Record<TipoContenedor, string> = {
   pallet: 'Pallet',
   caja: 'Caja',
+  sobre: 'Sobre'
 };
 
 class CargaService {

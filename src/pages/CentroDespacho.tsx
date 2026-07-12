@@ -12,6 +12,7 @@ type VehiculoKey = keyof typeof VEHICULOS;
 const ETIQUETA_CONTENEDOR: Record<TipoContenedor, string> = {
   pallet: 'Pallet',
   caja: 'Caja',
+  sobre: 'Sobre'
 };
 
 const CentroDespacho: React.FC = () => {
